@@ -60,7 +60,9 @@ PROGRAM=CollectQualityYieldMetrics
 
 END_COLLECT_MULTIPLE_METRICS=`date '+%s'`
 
-echo $SM_TAG"_"$PROJECT",COLLECT_MULTIPLE_METRICS,"$START_COLLECT_MULTIPLE_METRICS","$END_COLLECT_MULTIPLE_METRICS \
+HOSTNAME=`hostname`
+
+echo $SM_TAG"_"$PROJECT",COLLECT_MULTIPLE_METRICS,"$HOSTNAME","$START_COLLECT_MULTIPLE_METRICS","$END_COLLECT_MULTIPLE_METRICS \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $JAVA_1_7/java -jar $PICARD_DIR/picard.jar \
@@ -74,6 +76,8 @@ PROGRAM=CollectGcBiasMetrics \
 PROGRAM=CollectSequencingArtifactMetrics \
 PROGRAM=CollectQualityYieldMetrics \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
+
+echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 # Move and rename bait bais metrics/summary files to the reports directory and add a txt extension
 

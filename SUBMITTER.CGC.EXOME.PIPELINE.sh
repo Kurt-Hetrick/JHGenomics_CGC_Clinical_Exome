@@ -97,7 +97,8 @@ $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/REPORTS/MEAN_QUALITY_BY_CYCLE/{METRICS,PDF} \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/REPORTS/ANEUPLOIDY_CHECK \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/{TEMP,FASTQ,REPORTS} \
-$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/LOGS
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/LOGS \
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/VCF/{RAW,VQSR}
 }
 
 for SAMPLE in $(awk 'BEGIN {FS=","} NR>1 {print $8}' $SAMPLE_SHEET | sort | uniq );
@@ -241,18 +242,18 @@ done
 
 ### Run GenotypeGVCF per Family
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 -k 3 \
 | uniq \
-| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 unique 4 \
+| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 unique 4 unique 5 \
 | awk 'BEGIN {FS="\t"}
 gsub (/,/,",H.001_HAPLOTYPE_CALLER_"$1"_",$3) \
 {print "qsub","-N","H.001-A.0001_GENOTYPE_GVCF_"$2"_"$1,\
 "-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
 "/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.001-A.001_GENOTYPE_GVCF.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4"\n""sleep 3s"}'
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4,$5"\n""sleep 3s"}'
 
 # Run POST BQSR TABLE
 

@@ -25,9 +25,6 @@
 
 set
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 JAVA_1_7=$1
 GATK_DIR=$2
 CORE_PATH=$3
@@ -38,6 +35,9 @@ FAMILY=$6
 SM_TAG=$7
 REF_GENOME=$8
 TARGET_BED=$9
+
+RIS_ID=${SM_TAG%@*}
+BARCODE_2D=${SM_TAG#*@}
 
 ## --Creating an on the fly VCF file to be used as the reference for verifyBamID--
 ## --remove X and Y data
@@ -53,9 +53,11 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -XL Y \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".VerifyBamID.vcf"
 
-START_SELECT_VERIFYBAMID_VCF=`date '+%s'`
+END_SELECT_VERIFYBAMID_VCF=`date '+%s'`
 
-echo $SM_TAG"_"$PROJECT",SELECT_VERIFYBAMID_VCF,"$START_SELECT_VERIFYBAMID_VCF","$END_SELECT_VERIFYBAMID_VCF \
+HOSTNAME=`hostname`
+
+echo $SM_TAG"_"$PROJECT",SELECT_VERIFYBAMID_VCF,"$HOSTNAME","$START_SELECT_VERIFYBAMID_VCF","$END_SELECT_VERIFYBAMID_VCF \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
@@ -67,3 +69,5 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -XL Y \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".VerifyBamID.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
+
+echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"

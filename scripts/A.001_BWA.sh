@@ -100,8 +100,12 @@ OUTPUT=$CORE_PATH/$PROJECT/TEMP/$PLATFORM_UNIT".bam"
 
 END_BWA_MEM=`date '+%s'`
 
-echo $SM_TAG"_"$PROJECT",BWA_MEM,"$START_BWA_MEM","$END_BWA_MEM \
+HOSTNAME=`hostname`
+
+echo $SM_TAG"_"$PROJECT",BWA_MEM,"$HOSTNAME","$START_BWA_MEM","$END_BWA_MEM \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
+
+# I'm guessing the pipe screws up the echo. Need to look up how to echo a pipe.
 
 # echo $BWA_DIR/bwa mem \
 # -M \

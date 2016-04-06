@@ -32,6 +32,7 @@ CORE_PATH=$3
 PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
+DBSNP=$7
 
 RIS_ID=${SM_TAG%@*}
 BARCODE_2D=${SM_TAG#*@}
@@ -41,9 +42,20 @@ START_GENOTYPE_GVCF=`date '+%s'`
 $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T GenotypeGVCFs \
 -R $REF_GENOME \
+--dbsnp $DBSNP \
 --annotateNDA \
+--includeNonVariantSites \
+--disable_auto_index_creation_and_locking_when_reading_rods \
+--standard_min_confidence_threshold_for_calling 30 \
+--standard_min_confidence_threshold_for_emitting 0 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
--o $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".RAW.vcf"
+-o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf"
 
 END_GENOTYPE_GVCF=`date '+%s'`
 
+HOSTNAME=`hostname`
+
+echo $FAMILY"_"$PROJECT",GENOTYPE_GVCF,"$HOSTNAME","$START_GENOTYPE_GVCF","$END_GENOTYPE_GVCF \
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
+
+echo >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
