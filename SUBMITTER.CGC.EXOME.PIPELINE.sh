@@ -3,6 +3,10 @@
 SAMPLE_SHEET=$1
 PED_FILE=$2
 
+# CHANGE SCRIPT DIR TO WHERE YOU HAVE HAVE THE SCRIPTS BEING SUBMITTED
+
+SCRIPT_DIR="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts"
+
 JAVA_1_7="/isilon/sequencing/Kurt/Programs/Java/jdk1.7.0_25/bin"
 JAVA_1_8="/isilon/sequencing/Kurt/Programs/Java/jdk1.8.0_73/bin"
 CORE_PATH="/isilon/sequencing/Seq_Proj/"
@@ -115,7 +119,7 @@ done
 awk '{split($18,INDEL,";");split($8,smtag,"[@-]"); \
 print "qsub","-N","A.001_BWA_"$8"_"$2"_"$3"_"$4,\
 "-o","'$CORE_PATH'/"$1"/"$19"/"$8"/LOGS/"$8"_"$2"_"$3"_"$4".BWA.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/A.001_BWA.sh",\
+"'$SCRIPT_DIR'""/A.001_BWA.sh",\
 "'$BWA_DIR'","'$JAVA_1_8'","'$PICARD_DIR'","'$CORE_PATH'",$1,$19,$2,$3,$4,$5,$6,$7,$8,$9,$10,$12"\n""sleep 3s"}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt
 
@@ -134,7 +138,7 @@ gsub(/,/,",INPUT=/isilon/sequencing/Seq_Proj/"$1"/TEMP/",$5) \
 {print "qsub","-N","B.001_MERGE_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".MERGE.BAM.FILES.log",\
 "-hold_jid","A.001_BWA_"$3"_"$4, \
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/B.001_MERGE_SORT_AGGRO.sh",\
+"'$SCRIPT_DIR'""/B.001_MERGE_SORT_AGGRO.sh",\
 "'$JAVA_1_8'","'$PICARD_DIR'","'$CORE_PATH'",$1,$2,$3,"INPUT=/isilon/sequencing/Seq_Proj/"$1"/TEMP/"$5"\n""sleep 3s"}'
 
 # Mark duplicates on the bam file above. Create a Mark Duplicates report which goes into the QC report
@@ -147,7 +151,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 print "qsub","-N","C.001_MARK_DUPLICATES_"$3"_"$1,\
 "-hold_jid","B.001_MERGE_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".MARK_DUPLICATES.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/C.001_MARK_DUPLICATES.sh",\
+"'$SCRIPT_DIR'""/C.001_MARK_DUPLICATES.sh",\
 "'$JAVA_1_8'","'$PICARD_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
 
 # Generate a list of places that could be potentially realigned.
@@ -160,7 +164,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18}' \
 print "qsub","-N","D.001_REALIGNER_TARGET_CREATOR_"$3"_"$1,\
 "-hold_jid","C.001_MARK_DUPLICATES_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".REALIGNER_TARGET_CREATOR.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/D.001_REALIGNER_TARGET_CREATOR.sh",\
+"'$SCRIPT_DIR'""/D.001_REALIGNER_TARGET_CREATOR.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,INDEL[1],INDEL[2]"\n""sleep 3s"}'
 
 # With the list generated above walk through the BAM file and realign where necessary
@@ -174,7 +178,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18}' \
 print "qsub","-N","E.001_INDEL_REALIGNER_"$3"_"$1,\
 "-hold_jid","D.001_REALIGNER_TARGET_CREATOR_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".INDEL_REALIGNER.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/E.001_INDEL_REALIGNER.sh",\
+"'$SCRIPT_DIR'""/E.001_INDEL_REALIGNER.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,INDEL[1],INDEL[2]"\n""sleep 3s"}'
 
 # Run Base Quality Score Recalibration
@@ -187,7 +191,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18,$17,$15}' \
 print "qsub","-N","F.001_PERFORM_BQSR_"$3"_"$1,\
 "-hold_jid","E.001_INDEL_REALIGNER_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".PERFORM_BQSR.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/F.001_PERFORM_BQSR.sh",\
+"'$SCRIPT_DIR'""/F.001_PERFORM_BQSR.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,INDEL[1],INDEL[2],$6,$7"\n""sleep 3s"}'
 
 # write Final Bam file
@@ -200,7 +204,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 print "qsub","-N","G.001_FINAL_BAM_"$3"_"$1,\
 "-hold_jid","F.001_PERFORM_BQSR_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".FINAL_BAM.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/G.001_FINAL_BAM.sh",\
+"'$SCRIPT_DIR'""/G.001_FINAL_BAM.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
 
 ##### ALL H.00X SERIES OF SCRIPTS CAN BE RUN IN PARALLEL SINCE THEY ARE DEPENDENT ON FINAL BAM FILE GENERATION #####
@@ -215,7 +219,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$15}' \
 print "qsub","-N","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".HAPLOTYPE_CALLER.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.001_HAPLOTYPE_CALLER.sh",\
+"'$SCRIPT_DIR'""/H.001_HAPLOTYPE_CALLER.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
 ### CREATE A GVCF ".list" file for each sample
@@ -252,7 +256,7 @@ gsub (/,/,",H.001_HAPLOTYPE_CALLER_"$1"_",$3) \
 {print "qsub","-N","H.001-A.0001_GENOTYPE_GVCF_"$2"_"$1,\
 "-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.001-A.001_GENOTYPE_GVCF.sh",\
+"'$SCRIPT_DIR'""/H.001-A.001_GENOTYPE_GVCF.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4,$5"\n""sleep 3s"}'
 
 # Run POST BQSR TABLE
@@ -265,7 +269,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18,$17}' \
 print "qsub","-N","H.002_POST_BQSR_TABLE_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".POST_BQSR_TABLE.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.002_POST_BQSR_TABLE.sh",\
+"'$SCRIPT_DIR'""/H.002_POST_BQSR_TABLE.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,INDEL[1],INDEL[2],$6"\n""sleep 3s"}'
 
 # Run ANALYZE COVARIATES
@@ -278,7 +282,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 print "qsub","-N","H.002-A.001_ANALYZE_COVARIATES_"$3"_"$1,\
 "-hold_jid","H.002_POST_BQSR_TABLE_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".ANALYZE_COVARIATES.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.002-A.001_ANALYZE_COVARIATES.sh",\
+"'$SCRIPT_DIR'""/H.002-A.001_ANALYZE_COVARIATES.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
 
 # RUN DOC CODING PLUS 10 BP FLANKS
@@ -291,7 +295,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 print "qsub","-N","H.003_DOC_CODING_10bpFLANKS_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".DOC_CODING_10bpFLANKS.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.003_DOC_CODING_10bpFLANKS.sh",\
+"'$SCRIPT_DIR'""/H.003_DOC_CODING_10bpFLANKS.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$CODING_BED'","'$GENE_LIST'",$1,$2,$3,$4"\n""sleep 3s"}'
 
 # # RUN DOC SUPERSET BED ### TAKING THIS OUT
@@ -304,7 +308,7 @@ print "qsub","-N","H.003_DOC_CODING_10bpFLANKS_"$3"_"$1,\
 # print "qsub","-N","H.004_DOC_SUPERSET_BED_"$3"_"$1,\
 # "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 # "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".DOC_SUPERSET_BED.log",\
-# "/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.004_DOC_SUPERSET_BED.sh",\
+# "'$SCRIPT_DIR'""/H.004_DOC_SUPERSET_BED.sh",\
 # "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$GENE_LIST'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
 # RUN DOC TARGET BED
@@ -317,7 +321,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 print "qsub","-N","H.005_DOC_TARGET_BED_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".DOC_TARGET_BED.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.005_DOC_TARGET_BED.sh",\
+"'$SCRIPT_DIR'""/H.005_DOC_TARGET_BED.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$GENE_LIST'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
 # RUN ANEUPLOIDY_CHECK AFTER DOC TARGET BED FINISHES
@@ -330,7 +334,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 print "qsub","-N","H.005-A.001_DOC_CHROM_DEPTH_"$3"_"$1,\
 "-hold_jid","H.005_DOC_TARGET_BED_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".ANEUPLOIDY_CHECK.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.005-A.001_CHROM_DEPTH.sh",\
+"'$SCRIPT_DIR'""/H.005-A.001_CHROM_DEPTH.sh",\
 "'$CORE_PATH'","'$CYTOBAND_BED'","'$DATAMASH_DIR'","'$BEDTOOLS_DIR'",$1,$2,$3"\n""sleep 3s"}'
 
 # RUN COLLECT MULTIPLE METRICS
@@ -343,7 +347,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17,$16}' \
 print "qsub","-N","H.006_COLLECT_MULTIPLE_METRICS_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".COLLECT_MULTIPLE_METRICS.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.006_COLLECT_MULTIPLE_METRICS.sh",\
+"'$SCRIPT_DIR'""/H.006_COLLECT_MULTIPLE_METRICS.sh",\
 "'$JAVA_1_8'","'$PICARD_DIR'","'$CORE_PATH'","'$SAMTOOLS_DIR'",$1,$2,$3,$4,$5,$6"\n""sleep 3s"}'
 
 # RUN COLLECT HS METRICS
@@ -356,7 +360,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$15,$16}' \
 print "qsub","-N","H.007_COLLECT_HS_METRICS_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".COLLECT_HS_METRICS.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.007_COLLECT_HS_METRICS.sh",\
+"'$SCRIPT_DIR'""/H.007_COLLECT_HS_METRICS.sh",\
 "'$JAVA_1_8'","'$PICARD_DIR'","'$CORE_PATH'","'$SAMTOOLS_DIR'",$1,$2,$3,$4,$5,$6"\n""sleep 3s"}'
 
 # RUN SELECT VERIFYBAM ID VCF
@@ -369,7 +373,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 print "qsub","-N","H.008_SELECT_VERIFYBAMID_VCF_"$3"_"$1,\
 "-hold_jid","G.001_FINAL_BAM_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".SELECT_VERIFYBAMID_VCF.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.008_SELECT_VERIFYBAMID_VCF.sh",\
+"'$SCRIPT_DIR'""/H.008_SELECT_VERIFYBAMID_VCF.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$VERIFY_VCF'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
 # RUN VERIFYBAMID
@@ -382,7 +386,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 print "qsub","-N","H.008-A.001_VERIFYBAMID_"$3"_"$1,\
 "-hold_jid","H.008_SELECT_VERIFYBAMID_VCF_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".VERIFYBAMID.log",\
-"/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts/H.008-A.001_VERIFYBAMID.sh",\
+"'$SCRIPT_DIR'""/H.008-A.001_VERIFYBAMID.sh",\
 "'$CORE_PATH'","'$VERIFY_DIR'",$1,$2,$3"\n""sleep 3s"}'
 
 
