@@ -49,7 +49,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --input_file $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \
 -L $BAIT_BED \
---emitRefConfidence GVCF \
+--emitRefConfidence BP_RESOLUTION \
 --variant_index_type LINEAR \
 --variant_index_parameter 128000 \
 -A DepthPerSampleHC \
@@ -68,7 +68,7 @@ END_HAPLOTYPE_CALLER=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $SM_TAG"_"$PROJECT",HAPLOTYPE_CALLER,"$HOSTNAME","$START_HAPLOTYPE_CALLER","$END_HAPLOTYPE_CALLER \
+echo $SM_TAG"_"$PROJECT",H.001,HAPLOTYPE_CALLER,"$HOSTNAME","$START_HAPLOTYPE_CALLER","$END_HAPLOTYPE_CALLER \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
@@ -76,7 +76,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --input_file $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \
 -L $BAIT_BED \
---emitRefConfidence GVCF \
+--emitRefConfidence BP_RESOLUTION \
 --variant_index_type LINEAR \
 --variant_index_parameter 128000 \
 -A DepthPerSampleHC \
@@ -95,7 +95,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".MD5.txt"
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.idx" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".MD5.txt"
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

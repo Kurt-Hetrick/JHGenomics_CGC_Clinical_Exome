@@ -102,34 +102,35 @@ END_BWA_MEM=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $SM_TAG"_"$PROJECT",BWA_MEM,"$HOSTNAME","$START_BWA_MEM","$END_BWA_MEM \
+echo $SM_TAG"_"$PROJECT",A.001,BWA_MEM,"$HOSTNAME","$START_BWA_MEM","$END_BWA_MEM \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 # I'm guessing the pipe screws up the echo. Need to look up how to echo a pipe.
 
-# echo $BWA_DIR/bwa mem \
-# -M \
-# -t 4 \
-# $REF_GENOME \
-# $FASTQ_1 \
-# $FASTQ_2 \
-# | $JAVA_1_7/java -jar \
-# $PICARD_DIR/picard.jar AddOrReplaceReadGroups \
-# INPUT=/dev/stdin \
-# CREATE_INDEX=true \
-# SORT_ORDER=coordinate \
-# RGID= $FLOWCELL"_"$LANE \
-# RGLB= $LIBRARY_NAME \
-# RGPL= $PLATFORM \
-# RGPU= $PLATFORM_UNIT \
-# RGSM= $SM_TAG \
-# RGCN= $CENTER \
-# RGDS= $DESCRIPTION \
-# RGDT= $ISO_8601 \
-# RGPG= CGC_CIDRSEQSUITE_0.0.0-0 \
-# OUTPUT=$CORE_PATH/$PROJECT/TEMP/$PLATFORM_UNIT".bam" \
-# >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
+echo $BWA_DIR/bwa mem \
+-M \
+-t 4 \
+$REF_GENOME \
+$FASTQ_1 \
+$FASTQ_2 \
+\| $JAVA_1_7/java -jar \
+$PICARD_DIR/picard.jar AddOrReplaceReadGroups \
+INPUT=/dev/stdin \
+CREATE_INDEX=true \
+SORT_ORDER=coordinate \
+RGID= $FLOWCELL"_"$LANE \
+RGLB= $LIBRARY_NAME \
+RGPL= $PLATFORM \
+RGPU= $PLATFORM_UNIT \
+RGSM= $SM_TAG \
+RGCN= $CENTER \
+RGDS= $DESCRIPTION \
+RGDT= $ISO_8601 \
+RGPG= CGC_CIDRSEQSUITE_0.0.0-0 \
+OUTPUT=$CORE_PATH/$PROJECT/TEMP/$PLATFORM_UNIT".bam" \
+>> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
+echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 # RGPG # PROGRAM...HMM...CIDRSEQSUITE VERSION MAYBE?...# Actually this is a really good idea for a clinical pipeline
 # RGPM # THIS IS WHAT WE ACTUALLY USE DESCRIPTION FOR...

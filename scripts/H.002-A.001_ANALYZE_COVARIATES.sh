@@ -23,6 +23,7 @@
 # export all variables, useful to find out what compute node the program was executed on
 # redirecting stderr/stdout to file as a log.
 
+# This would be a good candidate to write a bright module to load this.
 source /u01/home/khetrick/bashrc_change_R
 
 set
@@ -54,7 +55,7 @@ END_ANALYZE_COVARIATES=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $SM_TAG"_"$PROJECT",ANALYZE_COVARIATES,"$HOSTNAME","$START_ANALYZE_COVARIATES","$END_ANALYZE_COVARIATES \
+echo $SM_TAG"_"$PROJECT",H.001,ANALYZE_COVARIATES,"$HOSTNAME","$START_ANALYZE_COVARIATES","$END_ANALYZE_COVARIATES \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
@@ -68,5 +69,5 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/PDF/$SM_TAG".BQSR.pdf" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".MD5.txt"
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 

@@ -55,7 +55,23 @@ END_GENOTYPE_GVCF=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $FAMILY"_"$PROJECT",GENOTYPE_GVCF,"$HOSTNAME","$START_GENOTYPE_GVCF","$END_GENOTYPE_GVCF \
+echo $FAMILY"_"$PROJECT",I.001,GENOTYPE_GVCF,"$HOSTNAME","$START_GENOTYPE_GVCF","$END_GENOTYPE_GVCF \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
+echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+-T GenotypeGVCFs \
+-R $REF_GENOME \
+--dbsnp $DBSNP \
+--annotateNDA \
+--includeNonVariantSites \
+--disable_auto_index_creation_and_locking_when_reading_rods \
+--standard_min_confidence_threshold_for_calling 30 \
+--standard_min_confidence_threshold_for_emitting 0 \
+--variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
+-o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf" \
+>> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY.COMMAND.LINES.txt
+
+echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY.COMMAND.LINES.txt
+
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf" \
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

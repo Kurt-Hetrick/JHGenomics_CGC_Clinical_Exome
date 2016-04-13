@@ -10,7 +10,7 @@ SCRIPT_DIR="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scrip
 JAVA_1_7="/isilon/sequencing/Kurt/Programs/Java/jdk1.7.0_25/bin"
 JAVA_1_8="/isilon/sequencing/Kurt/Programs/Java/jdk1.8.0_73/bin"
 CORE_PATH="/isilon/sequencing/Seq_Proj/"
-BWA_DIR="/isilon/sequencing/Kurt/Programs/BWA/bwa-0.7.8/"
+BWA_DIR="/isilon/sequencing/Kurt/Programs/BWA/bwa-0.7.8"
 PICARD_DIR="/isilon/sequencing/Kurt/Programs/Picard/picard-tools-2.1.1"
 # PICARD_DIR="/isilon/sequencing/VITO/Programs/picard/picard-tools-1.141"
 GATK_DIR="/isilon/sequencing/CIDRSeqSuiteSoftware/gatk/GATK_3/GenomeAnalysisTK-3.5-0"
@@ -19,13 +19,13 @@ VERIFY_DIR="/isilon/sequencing/Kurt/Programs/VerifyBamID/verifyBamID_20120620/bi
 GENE_LIST="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/RefSeqGene.GRCh37.Ready.txt"
 VERIFY_VCF="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/Omni25_genotypes_1525_samples_v2.b37.PASS.ALL.sites.vcf"
 CODING_BED="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/UCSC_hg19_CodingOnly_083013_MERGED_noContigs_noCHR.bed"
-SAMTOOLS_DIR="/isilon/sequencing/Kurt/Programs/samtools/samtools-0.1.18/"
-TABIX_DIR="/isilon/sequencing/Kurt/Programs/TABIX/tabix-0.2.6/"
+SAMTOOLS_DIR="/isilon/sequencing/Kurt/Programs/samtools/samtools-0.1.18"
+TABIX_DIR="/isilon/sequencing/Kurt/Programs/TABIX/tabix-0.2.6"
 CORE_PATH="/isilon/sequencing/Seq_Proj"
-DATAMASH_DIR="/isilon/sequencing/Kurt/Programs/PATH/"
+DATAMASH_DIR="/isilon/sequencing/Kurt/Programs/PATH"
 CYTOBAND_BED="/isilon/sequencing/Kurt/CGC/GRCh37.Cytobands.bed"
 # BEDTOOLS IS v2.22.0
-BEDTOOLS_DIR="/isilon/sequencing/Kurt/Programs/PATH/"
+BEDTOOLS_DIR="/isilon/sequencing/Kurt/Programs/PATH"
 
 ##### MAKE A DIRECTORY TREE ##### SHOULD BE COMPLETE #####
 
@@ -222,43 +222,6 @@ print "qsub","-N","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
 "'$SCRIPT_DIR'""/H.001_HAPLOTYPE_CALLER.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
-### CREATE A GVCF ".list" file for each sample
-
-CREATE_GVCF_LIST ()
-{
-awk 'BEGIN {OFS="/"} $19=="'$FAMILY'" {print "'$CORE_PATH'",$1,$19,$8,"GVCF",$8".g.vcf"}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort \
-| uniq \
->| $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/$FAMILY/$FAMILY".gvcf.list"
-}
-
-CREATE_FAMILY_INFO_ARRAY ()
-{
-FAMILY_INFO_ARRAY=(`awk '$19=="'$FAMILY'" {print $1,$19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
-}
-
-for FAMILY in $( awk '{print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq ) ;
-do
-CREATE_FAMILY_INFO_ARRAY
-CREATE_GVCF_LIST
-done
-
-### Run GenotypeGVCF per Family
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 unique 4 unique 5 \
-| awk 'BEGIN {FS="\t"}
-gsub (/,/,",H.001_HAPLOTYPE_CALLER_"$1"_",$3) \
-{print "qsub","-N","H.001-A.0001_GENOTYPE_GVCF_"$2"_"$1,\
-"-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
-"'$SCRIPT_DIR'""/H.001-A.001_GENOTYPE_GVCF.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4,$5"\n""sleep 3s"}'
-
 # Run POST BQSR TABLE
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18,$17}' \
@@ -388,6 +351,151 @@ print "qsub","-N","H.008-A.001_VERIFYBAMID_"$3"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".VERIFYBAMID.log",\
 "'$SCRIPT_DIR'""/H.008-A.001_VERIFYBAMID.sh",\
 "'$CORE_PATH'","'$VERIFY_DIR'",$1,$2,$3"\n""sleep 3s"}'
+
+#### JOINT CALLING AND VQSR ####
+
+### CREATE A GVCF ".list" file for each sample
+
+CREATE_GVCF_LIST ()
+{
+awk 'BEGIN {OFS="/"} $19=="'$FAMILY'" {print "'$CORE_PATH'",$1,$19,$8,"GVCF",$8".g.vcf"}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort \
+| uniq \
+>| $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/$FAMILY/$FAMILY".gvcf.list"
+}
+
+CREATE_FAMILY_INFO_ARRAY ()
+{
+FAMILY_INFO_ARRAY=(`awk '$19=="'$FAMILY'" {print $1,$19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
+}
+
+for FAMILY in $( awk '{print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq ) ;
+do
+CREATE_FAMILY_INFO_ARRAY
+CREATE_GVCF_LIST
+done
+
+### Run GenotypeGVCF per Family
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 unique 4 unique 5 \
+| awk 'BEGIN {FS="\t"}
+gsub (/,/,",H.001_HAPLOTYPE_CALLER_"$1"_",$3) \
+{print "qsub","-N","H.001-A.001_GENOTYPE_GVCF_"$2"_"$1,\
+"-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
+"'$SCRIPT_DIR'""/H.001-A.001_GENOTYPE_GVCF.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4,$5"\n""sleep 3s"}'
+
+### Run Variant Recalibrator for the SNP model, this is done in parallel with the INDEL model
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","H.001-A.001-A.001_VARIANT_RECALIBRATOR_SNP_"$2"_"$1,\
+"-hold_jid","H.001-A.001_GENOTYPE_GVCF_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_RECALIBRATOR_SNP.log",\
+"'$SCRIPT_DIR'""/H.001-A.001-A.001_VARIANT_RECALIBRATOR_SNP.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### Run Variant Recalibrator for the INDEL model, this is done in parallel with the SNP model
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","H.001-A.001-A.002_VARIANT_RECALIBRATOR_INDEL_"$2"_"$1,\
+"-hold_jid","H.001-A.001_GENOTYPE_GVCF_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_RECALIBRATOR_INDEL.log",\
+"'$SCRIPT_DIR'""/H.001-A.001-A.002_VARIANT_RECALIBRATOR_INDEL.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### Run Apply Recalbration with the SNP model to the VCF file
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","H.001-A.001-A.001-A.001_APPLY_RECALIBRATION_SNP_"$2"_"$1,\
+"-hold_jid","H.001-A.001-A.001_VARIANT_RECALIBRATOR_SNP_"$2"_"$1",""H.001-A.001-A.002_VARIANT_RECALIBRATOR_INDEL_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".APPLY_RECALIBRATION_SNP.log",\
+"'$SCRIPT_DIR'""/H.001-A.001-A.001-A.001_APPLY_RECALIBRATION_SNP.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### Run Apply Recalibration with the INDEL model to the VCF file.
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","H.001-A.001-A.001-A.001-A.001_APPLY_RECALIBRATION_INDEL_"$2"_"$1,\
+"-hold_jid","H.001-A.001-A.001-A.001_APPLY_RECALIBRATION_SNP_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".APPLY_RECALIBRATION_INDEL.log",\
+"'$SCRIPT_DIR'""/H.001-A.001-A.001-A.001-A.001_APPLY_RECALIBRATION_INDEL.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### QC REPORT PREP ###
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk 'BEGIN {FS="\t"}
+{print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
+"-hold_jid","H.005-A.001_DOC_CHROM_DEPTH_"$3"_"$1","\
+"H.006_COLLECT_MULTIPLE_METRICS_"$3"_"$1","\
+"H.007_COLLECT_HS_METRICS_"$3"_"$1","\
+"H.008-A.001_VERIFYBAMID_"$3"_"$1,\
+"-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
+"'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
+"'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 3s"}'
+
+### END PROJECT TASKS ###
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 \
+| awk 'BEGIN {FS="\t"}
+gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$3) \
+{print "qsub","-N","X.01-X.01-END_PROJECT_TASKS_"$1,\
+"-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3,\
+"-o","'$CORE_PATH'/"$1"/LOGS/"$1".END_PROJECT_TASKS.log",\
+"'$SCRIPT_DIR'""/X.01-X.01-END_PROJECT_TASKS.sh",\
+"'$CORE_PATH'","'$DATAMASH_DIR'",$1"\n""sleep 3s"}'
+
+### kEY FOR BLAH ###
+# 
+#      1  CGC_160212_HJLWVBCXX_CGCDev1_TEST
+#      2  HJLWVBCXX
+#      3  1
+#      4  ATGCCTAA
+#      5  ILLUMINA
+#      6  A01_NA12878
+#      7  2/12/2016
+#      8  NA12878
+#      9  CGC
+#     10  HiSeq2500_RapidRun
+#     11  HJLWVBCXX_1_ATGCCTAA_A01_NA12878
+#     12  /isilon/sequencing/GATK_resource_bundle/bwa_mem_0.7.5a_ref/human_g1k_v37_decoy.fasta
+#     13  MBS
+#     14  /isilon/sequencing/data/Work/BED/Production_BED_files/TsTv_BED_File_Agilent_ClinicalExome_S06588914_OnExon_merged_021015_noCHR.bed
+#     15  /isilon/sequencing/data/Work/BED/Production_BED_files/ALLBED_BED_File_Agilent_ClinicalExome_S06588914_ALLBed_merged_021015_noCHR.bed
+#     16  /isilon/sequencing/data/Work/BED/Production_BED_files/Targets_BED_File_Agilent_ClinicalExome_S06588914_OnTarget_merged_noCHR_013015.bed
+#     17  /isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.vcf
+#     18  /isilon/sequencing/GATK_resource_bundle/2.2/b37/1000G_phase1.indels.b37.vcf;/isilon/sequencing/GATK_resource_bundle/2.2/b37/Mills_and_1000G_gold_standard.indels.b37.vcf
+#     19  XC01463
+#     20  NA12891
+#     21  NA12892
+#     22  2
+#     23  2
+#######
 
 
 ###### SAMPLE MANIFEST KEY...NOT SURE WHAT I AM GOING TO END UP DOING HERE ######
