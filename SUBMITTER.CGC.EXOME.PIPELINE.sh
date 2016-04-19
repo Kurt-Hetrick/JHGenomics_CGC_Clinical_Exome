@@ -426,6 +426,18 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$SCRIPT_DIR'""/H.001-A.001-A.001-A.001-A.001_APPLY_RECALIBRATION_INDEL.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
 
+### Add all possible GATK annotations to the VCF file.
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-hold_jid","H.001-A.001-A.001-A.001-A.001_APPLY_RECALIBRATION_INDEL_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".ADD_MORE_ANNOTATION.log",\
+"'$SCRIPT_DIR'""/M.01_ADD_MORE_ANNOTATION.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$PED_FILE'",$1,$2,$3"\n""sleep 3s"}'
+
 ### QC REPORT PREP ###
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
@@ -452,7 +464,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 | awk 'BEGIN {FS="\t"}
 gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$3) \
 {print "qsub","-N","X.01-X.01-END_PROJECT_TASKS_"$1,\
-"-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3",""H.001-A.001-A.001-A.001-A.001_APPLY_RECALIBRATION_INDEL_"$2"_"$1,\
+"-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3",""M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$1".END_PROJECT_TASKS.log",\
 "'$SCRIPT_DIR'""/X.01-X.01-END_PROJECT_TASKS.sh",\
 "'$CORE_PATH'","'$DATAMASH_DIR'",$1"\n""sleep 3s"}'

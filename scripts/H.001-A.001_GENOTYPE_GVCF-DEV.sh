@@ -37,8 +37,6 @@ DBSNP=$7
 RIS_ID=${SM_TAG%@*}
 BARCODE_2D=${SM_TAG#*@}
 
-CONTROL_REPO="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/data"
-
 START_GENOTYPE_GVCF=`date '+%s'`
 
 $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
@@ -50,7 +48,6 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --standard_min_confidence_threshold_for_calling 30 \
 --standard_min_confidence_threshold_for_emitting 0 \
---variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf"
 
@@ -70,7 +67,6 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --standard_min_confidence_threshold_for_calling 30 \
 --standard_min_confidence_threshold_for_emitting 0 \
---variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY.COMMAND.LINES.txt
