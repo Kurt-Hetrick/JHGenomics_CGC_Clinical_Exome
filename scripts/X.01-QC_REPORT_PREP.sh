@@ -36,6 +36,10 @@ MOTHER=$8
 GENDER=$9
 AFFECTED=${10}
 
+# sleeping for a random number of seconds before executing so datastream don't collide on the same file...hopefully
+
+echo $RANDOM | awk '{print $0/1000*5}' | awk '{split ($0,RANDOM_INTEGER,"."); print "sleep",RANDOM_INTEGER[1]}' | bash
+
 # Grabbing the BAM header (for RG ID,PU,LB,etc)
 
 ##### THIS IS THE HEADER, NEED TO THINK ABOUT HOW TO GET THIS BACK IN HERE ##########
@@ -131,7 +135,7 @@ $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/ALIGNMENT_SUMMARY/$SM_TAG".alignment
 
 # # GRABBING ALIGNMENT SUMMARY METRICS FOR PAIR # good
 ## THIS THE HEADER ##
-## {print "SM_TAG","TOTAL_READS","PF_NOISE_READS_PAIR","PF_READS_ALIGNED_PAIR","PCT_PF_READS_ALIGNED_PAIR",\
+## {print "SM_TAG","TOTAL_READS","RAW_GIGS","PF_NOISE_READS_PAIR","PF_READS_ALIGNED_PAIR","PCT_PF_READS_ALIGNED_PAIR",\
 ## "PF_ALIGNED_BASES_PAIR","PF_HQ_ALIGNED_READS_PAIR",\
 ## "PF_HQ_ALIGNED_BASES_PAIR",\
 ## "PF_HQ_ALIGNED_Q20_BASES_PAIR","PF_HQ_MEDIAN_MISMATCHES_PAIR","PF_MISMATCH_RATE_PAIR","PF_HQ_ERROR_RATE_PAIR","PF_INDEL_RATE_PAIR",\
@@ -139,7 +143,7 @@ $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/ALIGNMENT_SUMMARY/$SM_TAG".alignment
 ## "STRAND_BALANCE_PAIR","PCT_CHIMERAS_PAIR","PCT_ADAPTER_PAIR"} \
 ################################################
 
-awk 'BEGIN {OFS="\t"} NR==10 {print "'$SM_TAG'",$2,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$18,$19,$20,$21,$22}' \
+awk 'BEGIN {OFS="\t"} NR==10 {print "'$SM_TAG'",$2,($2*$16/1000000000),$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$18,$19,$20,$21,$22}' \
 $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/ALIGNMENT_SUMMARY/$SM_TAG".alignment_summary_metrics.txt" \
 >> $CORE_PATH/$PROJECT/TEMP/ALIGNMENT_SUMMARY_READ_PAIR_METRICS.TXT
 
@@ -201,94 +205,226 @@ awk 'BEGIN {OFS="\t"} NR==8 {print "'$SM_TAG'",$7/$5*100,$9/$5*100}' \
 $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/QUALITY_YIELD/$SM_TAG".quality_yield_metrics.txt" \
 >> $CORE_PATH/$PROJECT/TEMP/QUALITY_YIELD_METRICS.TXT
 
-# # GRABBING TI/TV ON EXON, ALL, MULTI-SAMPLE
+# GENERATE COUNT PCT,IN DBSNP FOR ON BAIT SNVS
+## THIS IS THE HEADER ##
+# {print "SM_TAG""\t""COUNT_SNV_ON_BAIT""\t""PERCENT_SNV_ON_BAIT_SNP138"} 
+#############################################33
+
+grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf" \
+| awk '{SNV_COUNT++NR} {DBSNP_COUNT+=($3~"rs")} \
+END {if (SNV_COUNT>=l) {print "'$SM_TAG'",SNV_COUNT,(DBSNP_COUNT/SNV_COUNT)*100} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/BAIT_SNV_METRICS.TXT
+
+# GENERATE COUNT PCT,IN DBSNP FOR ON TARGET SNVS
+## THIS IS THE HEADER ##
+# {print "SM_TAG""\t""COUNT_SNV_ON_TARGET""\t""PERCENT_SNV_ON_TARGET_SNP138"} 
+#############################################33
+
+grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_TARGET/$SM_TAG".SNV.ON_TARGET.PASS.vcf" \
+| awk '{SNV_COUNT++NR} {DBSNP_COUNT+=($3~"rs")} \
+END {if (SNV_COUNT>=l) {print "'$SM_TAG'",SNV_COUNT,(DBSNP_COUNT/SNV_COUNT)*100} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/TARGET_SNV_METRICS.TXT
+
+# GRABBING TI/TV ON UCSC CODING EXONS, ALL
+## This is the Header ##
+# {print "SM_TAG""\t""ALL_TI_TV_COUNT""\t""ALL_TI_TV_RATIO"}
+#################################3
+
+awk 'BEGIN {OFS="\t"} END {if ($2!="") {print "'$SM_TAG'",$2,$6} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/TI_TV/$SM_TAG"_All_.titv.txt" \
+>> $CORE_PATH/$PROJECT/TEMP/TITV_ALL.TXT
+
+# GRABBING TI/TV ON UCSC CODING EXONS, KNOWN
+## This is the Header ##
+# {print "SM_TAG""\t""KNOWN_TI_TV_COUNT""\t""KNOWN_TI_TV_RATIO"}
+#################################3
+
+awk 'BEGIN {OFS="\t"} END {if ($2!="") {print "'$SM_TAG'",$2,$6} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/TI_TV/$SM_TAG"_Known_.titv.txt" \
+>> $CORE_PATH/$PROJECT/TEMP/TITV_KNOWN.TXT
+
+# GRABBING TI/TV ON UCSC CODING EXONS, NOVEL
+## This is the Header ##
+# {print "SM_TAG""\t""NOVEL_TI_TV_COUNT""\t""NOVEL_TI_TV_RATIO"}
+#################################3
+
+awk 'BEGIN {OFS="\t"} END {if ($2!="") {print "'$SM_TAG'",$2,$6} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/TI_TV/$SM_TAG"_Novel_.titv.txt" \
+>> $CORE_PATH/$PROJECT/TEMP/TITV_NOVEL.TXT
+
+# # Generate a boatload of Indel metrics on bait
+#
+
+# INDEL METRICS ON BAIT
+# THIS IS THE HEADER
+# {print "SM_TAG","COUNT_ALL_INDEL_BAIT","ALL_INDEL_BAIT_PCT_SNP138","COUNT_BIALLELIC_INDEL_BAIT","BIALLELIC_INDEL_BAIT_PCT_SNP138",\
+# "I_GT15_COUNT_BAIT","I_GT15_BAIT_PCT_SNP138","D_GT15_COUNT_BAIT","D_GT15_BAIT_PCT_SNP138",\
+# "I_LT15_COUNT_BAIT","I_LT15_BAIT_PCT_SNP138","D_LT15_COUNT_BAIT","D_LT15_BAIT_PCT_SNP138",\
+# "I_D_RATIO_BAIT","I_D_RATIO_GT15_BAIT","I_D_RATIO_LT15_BAIT","I_1AND2_VS_3_BAIT","D_1AND2_VS_3_BAIT","BIGGEST_INSERTION","BIGGEST_DELETION"}'
+########################################################
+
+(grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_BAIT/$SM_TAG".INDEL.ON_BAIT.PASS.vcf" \
+| awk '{INDEL_COUNT++NR} \
+{INDEL_BIALLELIC+=($5!~",")} \
+{DBSNP_COUNT+=($3~"rs")} \
+{DBSNP_COUNT_BIALLELIC+=($3~"rs"&&$5!~",")} \
+{BIG_INSERTION_BIALLELIC+=(length($5)-length($4))>15&&$5!~","} \
+{BIG_INSERTION_BIALLELIC_DBSNP+=(length($5)-length($4))>15&&$5!~","&&$3~"rs"} \
+{BIG_DELETION_BIALLELIC+=(length($5)-length($4))<-15&&$5!~","} \
+{BIG_DELETION_BIALLELIC_DBSNP+=(length($5)-length($4))<-15&&$5!~","&&$3~"rs"} \
+{SMALL_INSERTION_BIALLELIC+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","} \
+{SMALL_INSERTION_BIALLELIC_DBSNP+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","&&$3~"rs"} \
+{SMALL_DELETION_BIALLELIC+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","} \
+{SMALL_DELETION_BIALLELIC_DBSNP+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","&&$3~"rs"} \
+{ONE_AND_TWO_BP_INSERTION_BIALLELIC+=((length($5)-length($4))<=2&&(length($5)-length($4))>0)&&$5!~","} \
+{THREE_BP_INSERTION_BIALLELIC+=(length($5)-length($4))==3&&$5!~","} \
+{ONE_AND_TWO_BP_DELETION_BIALLELIC+=((length($5)-length($4))>=-2&&(length($5)-length($4))<0)&&$5!~","} \
+{THREE_BP_DELETION_BIALLELIC+=(length($5)-length($4))==-3&&$5!~","} \
+END {print "'$SM_TAG'",INDEL_COUNT,(DBSNP_COUNT/INDEL_COUNT)*100,INDEL_BIALLELIC,(DBSNP_COUNT_BIALLELIC/INDEL_BIALLELIC)*100,\
+BIG_INSERTION_BIALLELIC,(BIG_INSERTION_BIALLELIC_DBSNP/BIG_INSERTION_BIALLELIC*100),BIG_DELETION_BIALLELIC,\
+(BIG_DELETION_BIALLELIC_DBSNP/BIG_DELETION_BIALLELIC*100),\
+SMALL_INSERTION_BIALLELIC,(SMALL_INSERTION_BIALLELIC_DBSNP/SMALL_INSERTION_BIALLELIC*100),SMALL_DELETION_BIALLELIC,\
+(SMALL_DELETION_BIALLELIC_DBSNP/SMALL_DELETION_BIALLELIC*100),\
+((BIG_INSERTION_BIALLELIC+SMALL_INSERTION_BIALLELIC)/(BIG_DELETION_BIALLELIC+SMALL_DELETION_BIALLELIC)),\
+(BIG_INSERTION_BIALLELIC/BIG_DELETION_BIALLELIC),(SMALL_INSERTION_BIALLELIC/SMALL_DELETION_BIALLELIC),\
+(ONE_AND_TWO_BP_INSERTION_BIALLELIC/THREE_BP_INSERTION_BIALLELIC),\
+(ONE_AND_TWO_BP_DELETION_BIALLELIC/THREE_BP_DELETION_BIALLELIC)}' \
+; grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_BAIT/$SM_TAG".INDEL.ON_BAIT.PASS.vcf" \
+| awk '$5!~","' \
+| awk '{INDEL_SIZE=(length($5)-length($4))} \
+{if (MIN_INDEL_SIZE==0) {MIN_INDEL_SIZE=MAX_INDEL_SIZE=INDEL_SIZE}; \
+if(INDEL_SIZE>MAX_INDEL_SIZE) {MAX_INDEL_SIZE=INDEL_SIZE}; \
+if(INDEL_SIZE<MIN_INDEL_SIZE) {MIN_INDEL_SIZE=INDEL_SIZE}} \
+END {print MAX_INDEL_SIZE,MIN_INDEL_SIZE}') \
+| paste - - \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_METRICS.TXT
+
+# ##################################### EXAMPLE OF ABOVE
 # 
-# ls $CORE_PATH/$PROJECT/REPORTS/TI_TV_MS/*_All_.titv.txt \
-# | awk 'BEGIN {OFS="\t"} {split($1,SMtag,"/");print "awk \x27 END {print \x22"SMtag[9]"\x22,$2,$6}\x27",$0}' \
-# | bash \
-# | sed 's/_All_.titv.txt//g' \
-# | awk 'BEGIN {print "SM_TAG""\t""ALL_TI_TV_COUNT""\t""ALL_TI_TV_RATIO"} {print $1"\t"$2"\t"$3}' \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_ALL.MS.REPORT.TXT
-# 
-# # To account for when TI/TV is null
-# 
-# awk 'BEGIN {OFS="\t"} {if ($2!="") {print $0} else {print $1,"0","NaN"}}' $CORE_PATH/$PROJECT/TEMP/TI_TV_ALL.MS.REPORT.TXT \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_ALL.MS.REPORT.FIXED.TXT
-# 
-# # GRABBING TI/TV ON EXON, KNOWN, MULTI-SAMPLE
-# 
-# ls $CORE_PATH/$PROJECT/REPORTS/TI_TV_MS/*_Known_.titv.txt \
-# | awk 'BEGIN {OFS="\t"} {split($1,SMtag,"/");print "awk \x27 END {print \x22"SMtag[9]"\x22,$2,$6}\x27",$0}' \
-# | bash \
-# | sed 's/_Known_.titv.txt//g' \
-# | awk 'BEGIN {print "SM_TAG""\t""KNOWN_TI_TV_COUNT""\t""KNOWN_TI_TV_RATIO"} {print $1"\t"$2"\t"$3}' \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_KNOWN.MS.REPORT.TXT
-# 
-# # To account for when TI/TV is null
-# 
-# awk 'BEGIN {OFS="\t"} {if ($2!="") {print $0} else {print $1,"0","NaN"}}' $CORE_PATH/$PROJECT/TEMP/TI_TV_KNOWN.MS.REPORT.TXT \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_KNOWN.MS.REPORT.FIXED.TXT
-# 
-# # GRABBING TI/TV ON EXON, NOVEL, MULTI-SAMPLE
-# 
-# ls $CORE_PATH/$PROJECT/REPORTS/TI_TV_MS/*_Novel_.titv.txt \
-# | awk 'BEGIN {OFS="\t"} {split($1,SMtag,"/");print "awk \x27 END {print \x22"SMtag[9]"\x22,$2,$6}\x27",$0}' \
-# | bash \
-# | sed 's/_Novel_.titv.txt//g' \
-# | awk 'BEGIN {print "SM_TAG""\t""NOVEL_TI_TV_COUNT""\t""NOVEL_TI_TV_RATIO"} {print $1"\t"$2"\t"$3}' \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_NOVEL.MS.REPORT.TXT
-# 
-# # To account for when TI/TV is null
-# 
-# awk 'BEGIN {OFS="\t"} {if ($2!="") {print $0} else {print $1,"0","NaN"}}' $CORE_PATH/$PROJECT/TEMP/TI_TV_NOVEL.MS.REPORT.TXT \
-# >| $CORE_PATH/$PROJECT/TEMP/TI_TV_NOVEL.MS.REPORT.FIXED.TXT
-# 
-# # GENERATE COUNT, PCT IN DBSNP FOR ON TARGET SNVS
-# 
-# ls $CORE_PATH/$PROJECT/SNV/RELEASE/FILTERED_ON_TARGET/*.vcf \
-# | awk '{split($1,SMtag,"/");print "grep -v \x22^#\x22","'$CORE_PATH'""/""'$PROJECT'""/SNV/RELEASE/FILTERED_ON_TARGET/"SMtag[10],\
-# "| awk \x27{t++NR} {s+=($3~\x22rs\x22)} END {if (t>=1) {print \x22"SMtag[10]"\x22,t,(s/t*100)} else {print \x22"SMtag[10]"\x22,\x22\x30\x22,\x22NaN\x22}}\x27"}' \
-# | bash \
-# | sed 's/_MS_OnTarget_SNV.vcf//g' \
+# (grep -v "^#" NA00857-1Bl-1-3.INDEL.ON_TARGET.PASS.vcf \
+# | awk '{INDEL_COUNT++NR} \
+# {INDEL_BIALLELIC+=($5!~",")} \
+# {DBSNP_COUNT+=($3~"rs")} \
+# {DBSNP_COUNT_BIALLELIC+=($3~"rs"&&$5!~",")} \
+# {BIG_INSERTION_BIALLELIC+=(length($5)-length($4))>15&&$5!~","} \
+# {BIG_INSERTION_BIALLELIC_DBSNP+=(length($5)-length($4))>15&&$5!~","&&$3~"rs"} \
+# {BIG_DELETION_BIALLELIC+=(length($5)-length($4))<-15&&$5!~","} \
+# {BIG_DELETION_BIALLELIC_DBSNP+=(length($5)-length($4))<-15&&$5!~","&&$3~"rs"} \
+# {SMALL_INSERTION_BIALLELIC+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","} \
+# {SMALL_INSERTION_BIALLELIC_DBSNP+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","&&$3~"rs"} \
+# {SMALL_DELETION_BIALLELIC+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","} \
+# {SMALL_DELETION_BIALLELIC_DBSNP+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","&&$3~"rs"} \
+# {ONE_AND_TWO_BP_INSERTION_BIALLELIC+=((length($5)-length($4))<=2&&(length($5)-length($4))>0)&&$5!~","} \
+# {THREE_BP_INSERTION_BIALLELIC+=(length($5)-length($4))==3&&$5!~","} \
+# {ONE_AND_TWO_BP_DELETION_BIALLELIC+=((length($5)-length($4))>=-2&&(length($5)-length($4))<0)&&$5!~","} \
+# {THREE_BP_DELETION_BIALLELIC+=(length($5)-length($4))==-3&&$5!~","} \
+# END {print "SM_TAG",INDEL_COUNT,(DBSNP_COUNT/INDEL_COUNT)*100,INDEL_BIALLELIC,(DBSNP_COUNT_BIALLELIC/INDEL_BIALLELIC)*100,\
+# BIG_INSERTION_BIALLELIC,(BIG_INSERTION_BIALLELIC_DBSNP/BIG_INSERTION_BIALLELIC*100),BIG_DELETION_BIALLELIC,\
+# (BIG_DELETION_BIALLELIC_DBSNP/BIG_DELETION_BIALLELIC*100),\
+# SMALL_INSERTION_BIALLELIC,(SMALL_INSERTION_BIALLELIC_DBSNP/SMALL_INSERTION_BIALLELIC*100),SMALL_DELETION_BIALLELIC,\
+# (SMALL_DELETION_BIALLELIC_DBSNP/SMALL_DELETION_BIALLELIC*100),\
+# ((BIG_INSERTION_BIALLELIC+SMALL_INSERTION_BIALLELIC)/(BIG_DELETION_BIALLELIC+SMALL_DELETION_BIALLELIC)),\
+# (BIG_INSERTION_BIALLELIC/BIG_DELETION_BIALLELIC),(SMALL_INSERTION_BIALLELIC/SMALL_DELETION_BIALLELIC),\
+# (ONE_AND_TWO_BP_INSERTION_BIALLELIC/THREE_BP_INSERTION_BIALLELIC),\
+# (ONE_AND_TWO_BP_DELETION_BIALLELIC/THREE_BP_DELETION_BIALLELIC)}' \
+# ; grep -v "^#" NA00857-1Bl-1-3.INDEL.ON_TARGET.PASS.vcf \
+# | awk '$5!~","' \
+# | awk '{INDEL_SIZE=(length($5)-length($4))} \
+# {if (MIN_INDEL_SIZE==0) {MIN_INDEL_SIZE=MAX_INDEL_SIZE=INDEL_SIZE}; \
+# if(INDEL_SIZE>MAX_INDEL_SIZE) {MAX_INDEL_SIZE=INDEL_SIZE}; \
+# if(INDEL_SIZE<MIN_INDEL_SIZE) {MIN_INDEL_SIZE=INDEL_SIZE}} \
+# END {print MAX_INDEL_SIZE,MIN_INDEL_SIZE}') \
+# | paste - - \
 # | sed 's/ /\t/g' \
-# | awk 'BEGIN {print "SM_TAG""\t""COUNT_SNV_ON_TARGET"} {print $1"\t"$2}' \
-# >| $CORE_PATH/$PROJECT/TEMP/TARGET_SNV_PCT_DBSNP_RELEASE.txt
+# >> $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_METRICS.TXT
 # 
-# # GENERATE COUNT, PCT IN DBSNP FOR ON TARGET INDELS, MULTI-SAMPLE
+# #####################################################
+
+# # Generate a boatload of Indel metrics on TARGET
+#
+
+# INDEL METRICS ON TARGET
+# THIS IS THE HEADER
+# {print "SM_TAG","COUNT_ALL_INDEL_TARGET","ALL_INDEL_TARGET_PCT_SNP138","COUNT_BIALLELIC_INDEL_TARGET","BIALLELIC_INDEL_TARGET_PCT_SNP138",\
+# "I_GT15_COUNT_TARGET","I_GT15_TARGET_PCT_SNP138","D_GT15_COUNT_TARGET","D_GT15_TARGET_PCT_SNP138",\
+# "I_LT15_COUNT_TARGET","I_LT15_TARGET_PCT_SNP138","D_LT15_COUNT_TARGET","D_LT15_TARGET_PCT_SNP138",\
+# "I_D_RATIO_TARGET","I_D_RATIO_GT15_TARGET","I_D_RATIO_LT15_TARGET","I_1AND2_VS_3_TARGET","D_1AND2_VS_3_TARGET","BIGGEST_INSERTION","BIGGEST_DELETION"}'
+########################################################
+
+(grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_TARGET/$SM_TAG".INDEL.ON_TARGET.PASS.vcf" \
+| awk '{INDEL_COUNT++NR} \
+{INDEL_BIALLELIC+=($5!~",")} \
+{DBSNP_COUNT+=($3~"rs")} \
+{DBSNP_COUNT_BIALLELIC+=($3~"rs"&&$5!~",")} \
+{BIG_INSERTION_BIALLELIC+=(length($5)-length($4))>15&&$5!~","} \
+{BIG_INSERTION_BIALLELIC_DBSNP+=(length($5)-length($4))>15&&$5!~","&&$3~"rs"} \
+{BIG_DELETION_BIALLELIC+=(length($5)-length($4))<-15&&$5!~","} \
+{BIG_DELETION_BIALLELIC_DBSNP+=(length($5)-length($4))<-15&&$5!~","&&$3~"rs"} \
+{SMALL_INSERTION_BIALLELIC+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","} \
+{SMALL_INSERTION_BIALLELIC_DBSNP+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","&&$3~"rs"} \
+{SMALL_DELETION_BIALLELIC+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","} \
+{SMALL_DELETION_BIALLELIC_DBSNP+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","&&$3~"rs"} \
+{ONE_AND_TWO_BP_INSERTION_BIALLELIC+=((length($5)-length($4))<=2&&(length($5)-length($4))>0)&&$5!~","} \
+{THREE_BP_INSERTION_BIALLELIC+=(length($5)-length($4))==3&&$5!~","} \
+{ONE_AND_TWO_BP_DELETION_BIALLELIC+=((length($5)-length($4))>=-2&&(length($5)-length($4))<0)&&$5!~","} \
+{THREE_BP_DELETION_BIALLELIC+=(length($5)-length($4))==-3&&$5!~","} \
+END {print "'$SM_TAG'",INDEL_COUNT,(DBSNP_COUNT/INDEL_COUNT)*100,INDEL_BIALLELIC,(DBSNP_COUNT_BIALLELIC/INDEL_BIALLELIC)*100,\
+BIG_INSERTION_BIALLELIC,(BIG_INSERTION_BIALLELIC_DBSNP/BIG_INSERTION_BIALLELIC*100),BIG_DELETION_BIALLELIC,\
+(BIG_DELETION_BIALLELIC_DBSNP/BIG_DELETION_BIALLELIC*100),\
+SMALL_INSERTION_BIALLELIC,(SMALL_INSERTION_BIALLELIC_DBSNP/SMALL_INSERTION_BIALLELIC*100),SMALL_DELETION_BIALLELIC,\
+(SMALL_DELETION_BIALLELIC_DBSNP/SMALL_DELETION_BIALLELIC*100),\
+((BIG_INSERTION_BIALLELIC+SMALL_INSERTION_BIALLELIC)/(BIG_DELETION_BIALLELIC+SMALL_DELETION_BIALLELIC)),\
+(BIG_INSERTION_BIALLELIC/BIG_DELETION_BIALLELIC),(SMALL_INSERTION_BIALLELIC/SMALL_DELETION_BIALLELIC),\
+(ONE_AND_TWO_BP_INSERTION_BIALLELIC/THREE_BP_INSERTION_BIALLELIC),\
+(ONE_AND_TWO_BP_DELETION_BIALLELIC/THREE_BP_DELETION_BIALLELIC)}' \
+; grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_TARGET/$SM_TAG".INDEL.ON_TARGET.PASS.vcf" \
+| awk '$5!~","' \
+| awk '{INDEL_SIZE=(length($5)-length($4))} \
+{if (MIN_INDEL_SIZE==0) {MIN_INDEL_SIZE=MAX_INDEL_SIZE=INDEL_SIZE}; \
+if(INDEL_SIZE>MAX_INDEL_SIZE) {MAX_INDEL_SIZE=INDEL_SIZE}; \
+if(INDEL_SIZE<MIN_INDEL_SIZE) {MIN_INDEL_SIZE=INDEL_SIZE}} \
+END {print MAX_INDEL_SIZE,MIN_INDEL_SIZE}') \
+| paste - - \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/TARGET_INDEL_METRICS.TXT
+
+# BASIC METRICS FOR MIXED VARIANT TYPES ON BAIT
+
+# GENERATE COUNT PCT,IN DBSNP FOR ON BAIT MIXED VARIANT
+## THIS IS THE HEADER ##
+# {print "SM_TAG""\t""COUNT_MIXED_ON_BAIT""\t""PERCENT_MIXED_ON_BAIT_SNP138"} 
+#############################################33
+
+grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/MIXED/FILTERED_ON_BAIT/$SM_TAG".MIXED.ON_BAIT.PASS.vcf" \
+| awk '{MIXED_COUNT++NR} {DBSNP_COUNT+=($3~"rs")} \
+END {if (MIXED_COUNT>=l) {print "'$SM_TAG'",MIXED_COUNT,(DBSNP_COUNT/MIXED_COUNT)*100} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/BAIT_MIXED_METRICS.TXT
+
+# GENERATE COUNT PCT,IN DBSNP FOR ON TARGET MIXED VARIANT
+## THIS IS THE HEADER ##
+# {print "SM_TAG""\t""COUNT_MIXED_ON_TARGET""\t""PERCENT_MIXED_ON_TARGET_SNP138"} 
+#############################################33
+
+grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/MIXED/FILTERED_ON_TARGET/$SM_TAG".MIXED.ON_TARGET.PASS.vcf" \
+| awk '{MIXED_COUNT++NR} {DBSNP_COUNT+=($3~"rs")} \
+END {if (MIXED_COUNT>=l) {print "'$SM_TAG'",MIXED_COUNT,(DBSNP_COUNT/MIXED_COUNT)*100} \
+else {print "'$SM_TAG'","0","NaN"}}' \
+| sed 's/ /\t/g' \
+>> $CORE_PATH/$PROJECT/TEMP/TARGET_MIXED_METRICS.TXT
+
 # 
-# ls $CORE_PATH/$PROJECT/INDEL/RELEASE/FILTERED_ON_TARGET/*.vcf \
-# | awk '{split($1,SMtag,"/");print "grep -v \x22^#\x22","'$CORE_PATH'""/""'$PROJECT'""/INDEL/RELEASE/FILTERED_ON_TARGET/"SMtag[10],\
-# "| awk \x27{t++NR} {s+=($3~\x22rs\x22)} END {print \x22"SMtag[10]"\x22,t,(s/t*100)}\x27"}' \
-# | bash \
-# | sed 's/_MS_OnTarget_INDEL.vcf//g' \
-# | sed 's/ /\t/g' \
-# | awk 'BEGIN {print "SM_TAG""\t""COUNT_INDEL_ON_TARGET"} {print $1"\t"$2}' \
-# >| $CORE_PATH/$PROJECT/TEMP/TARGET_INDEL_PCT_DBSNP_MS.txt
 # 
-# # GENERATE COUNT PCT,IN DBSNP FOR ON BAIT SNVS
-# 
-# ls $CORE_PATH/$PROJECT/SNV/RELEASE/FILTERED_ON_BAIT/*.vcf \
-# | awk '{split($1,SMtag,"/");print "grep -v \x22^#\x22","'$CORE_PATH'""/""'$PROJECT'""/SNV/RELEASE/FILTERED_ON_BAIT/"SMtag[10],\
-# "| awk \x27{t++NR} {s+=($3~\x22rs\x22)} END {if (t>=1) {print \x22"SMtag[10]"\x22,t,(s/t*100)} else {print \x22"SMtag[10]"\x22,\x22\x30\x22,\x22NaN\x22}}\x27"}' \
-# | bash \
-# | sed 's/_MS_OnBait_SNV.vcf//g' \
-# | sed 's/ /\t/g' \
-# | awk 'BEGIN {print "SM_TAG""\t""COUNT_SNV_ON_BAIT""\t""PERCENT_SNV_ON_BAIT_SNP138"} {print $1"\t"$2"\t"$3}' \
-# >| $CORE_PATH/$PROJECT/TEMP/BAIT_SNV_PCT_DBSNP_RELEASE.txt
-# 
-# # GENERATE COUNT PCT,IN DBSNP FOR ON BAIT INDELS, MULTI-SAMPLE
-# 
-# ls $CORE_PATH/$PROJECT/INDEL/RELEASE/FILTERED_ON_BAIT/*.vcf \
-# | awk '{split($1,SMtag,"/");print "grep -v \x22^#\x22","'$CORE_PATH'""/""'$PROJECT'""/INDEL/RELEASE/FILTERED_ON_BAIT/"SMtag[10],\
-# "| awk \x27{t++NR} {s+=($3~\x22rs\x22)} END {print \x22"SMtag[10]"\x22,t,(s/t*100)}\x27"}' \
-# | bash \
-# | sed 's/_MS_OnBait_INDEL.vcf//g' \
-# | sed 's/ /\t/g' \
-# | awk 'BEGIN {print "SM_TAG""\t""COUNT_INDEL_ON_BAIT""\t""PERCENT_INDEL_ON_BAIT_SNP138"} {print $1"\t"$2"\t"$3}' \
-# >| $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_PCT_DBSNP_MS.txt
-# 
-# 
-# # # GRABBING ANNOVAR METRICS #
+# # # GRABBING ANNOVAR METRICS # Hopefully don't have to do this.
 # # 
 # # ls $CORE_PATH/$PROJECT/REPORTS/ANNOVAR/*txt \
 # # | awk '{split($1,SMtag,"/");print "awk \x27 BEGIN {FS=\x22\x5Ct\x22} \
@@ -313,50 +449,4 @@ $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/QUALITY_YIELD/$SM_TAG".quality_yield
 # # {print $1"\t"$2"\t"$3"\t"$4"\t"$5}' \
 # # >| $CORE_PATH/$PROJECT/TEMP/ANNOVAR_METRICS.TXT
 # 
-# 
-# # Creating a gender check
-# 
-# ls $CORE_PATH/$PROJECT/REPORTS/GENES_COVERAGE/TARGET/*sample_interval_summary.csv \
-# | awk 'BEGIN {OFS="\t"} {split($1,SMtag,"/"); print "awk \x27 BEGIN {FS=\x22,\x22} NR>1 {split($1,FOO,\x22:\x22); print \x22"SMtag[10]"\x22,FOO[1],FOO[2],$2}\x27",$0}' \
-# | bash \
-# | awk 'BEGIN {OFS="\t"} $3!~"-"&&$2~/^[0-9]/ {print $1,"AUTO",$3"-"$3,$4} $3~"-"&&$2~/^[0-9]/ {print $1,"AUTO",$3,$4} $3~"-"&&$2!~"[0-9]" {print $0} $3!~"-"&&$2!~"[0-9]" {print $1,$2,$3"-"$3,$4}' \
-# | awk 'BEGIN {OFS="\t"} {split($3,BAR,"-"); print $1,$2,(BAR[2]-(BAR[1]-1)),$4}' \
-# | datamash -g 1,2 sum 3 sum 4 \
-# | awk 'BEGIN {OFS="\t"} {print $1,$2,$4/$3}' \
-# | datamash -g 1 collapse 3 \
-# | awk 'BEGIN {print "SM_TAG","AUTO_AVG","X_AVG","X_NORM","Y_AVG","Y_NORM"} {split($2,FOO,",");split($1,BAR,".");print BAR[1],FOO[1],FOO[2],FOO[2]/FOO[1],FOO[3],FOO[3]/FOO[1]}' \
-# | sed 's/ /\t/g' \
-# >| $CORE_PATH/$PROJECT/TEMP/GENDER_CHECK.txt
-# 
-# # Joining all of the files together to make a QC report
-# 
-# TIMESTAMP=`date '+%F.%H-%M-%S'`
-# 
-# ( head -n 1 $MASTER_KEY ; awk 'NR>1' $MASTER_KEY | sort -t "," -k 3 ) \
-# | sed 's/ /_/g' \
-# | awk 'BEGIN {FS=","} {print $3,$2,$5,$8,$9,$10}' \
-# | join  --nocheck-order -i -j 1 - $CORE_PATH/$PROJECT/TEMP/SAMPLE_META.txt \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/VERFIY_BAM_ID.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/TI_TV_ALL.MS.REPORT.FIXED.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/TI_TV_KNOWN.MS.REPORT.FIXED.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/TI_TV_NOVEL.MS.REPORT.FIXED.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/TARGET_SNV_PCT_DBSNP_RELEASE.txt \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/TARGET_INDEL_PCT_DBSNP_MS.txt \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/BAIT_SNV_PCT_DBSNP_RELEASE.txt \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_PCT_DBSNP_MS.txt \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/INSERT_SIZE_METRICS.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/ALIGNMENT_SUMMARY_READ_1_METRICS.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/ALIGNMENT_SUMMARY_READ_2_METRICS.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/ALIGNMENT_SUMMARY_READ_PAIR_METRICS.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/MARK_DUPLICATES_METRICS.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/HYB_SELECTION.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/JUMPING.TXT \
-# | join -i -j 1 - $CORE_PATH/$PROJECT/TEMP/GENDER_CHECK.txt \
-# | sed 's/ /,/g' \
-# | sed 's/SM_Tag/SM_TAG/g' \
-# >| $CORE_PATH/$PROJECT/REPORTS/QC_REPORTS/$PROJECT".JOINT_CALLED."$TIMESTAMP".csv"
-# 
-# echo QC REPORT
-# echo $PROJECT".SINGLE_SAMPLE_QC."$TIMESTAMP".csv"
-# echo has been written to
-# echo $CORE_PATH/$PROJECT/REPORTS/QC_REPORTS
+

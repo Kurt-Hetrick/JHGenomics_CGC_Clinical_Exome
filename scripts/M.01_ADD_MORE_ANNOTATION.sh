@@ -42,6 +42,24 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --useAllAnnotations \
+--annotation AlleleBalance \
+--annotation AlleleBalanceBySample \
+--annotation AlleleCountBySample \
+--annotation BaseCounts \
+--annotation BaseCountsBySample \
+--annotation GCContent \
+--annotation GenotypeSummaries \
+--annotation HardyWeinberg \
+--annotation HomopolymerRun \
+--annotation InbreedingCoeff \
+--annotation LikelihoodRankSumTest \
+--annotation LowMQ \
+--annotation MVLikelihoodRatio \
+--annotation NBaseCount \
+--annotation SampleList \
+--annotation TandemRepeatAnnotator \
+--annotation TransmissionDisequilibriumTest \
+--annotation VariantType \
 --pedigree $PED_FILE \
 --pedigreeValidationType SILENT \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/$FAMILY".VQSR.vcf" \
@@ -60,8 +78,27 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --useAllAnnotations \
---pedigree $PED \
---input $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/$FAMILY".VQSR.vcf" \
+--annotation AlleleBalance \
+--annotation AlleleBalanceBySample \
+--annotation AlleleCountBySample \
+--annotation BaseCounts \
+--annotation BaseCountsBySample \
+--annotation GCContent \
+--annotation GenotypeSummaries \
+--annotation HardyWeinberg \
+--annotation HomopolymerRun \
+--annotation InbreedingCoeff \
+--annotation LikelihoodRankSumTest \
+--annotation LowMQ \
+--annotation MVLikelihoodRatio \
+--annotation NBaseCount \
+--annotation SampleList \
+--annotation TandemRepeatAnnotator \
+--annotation TransmissionDisequilibriumTest \
+--annotation VariantType \
+--pedigree $PED_FILE \
+--pedigreeValidationType SILENT \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/$FAMILY".VQSR.vcf" \
 -L $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/$FAMILY".VQSR.vcf" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/$FAMILY".VQSR.ANNOTATED.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

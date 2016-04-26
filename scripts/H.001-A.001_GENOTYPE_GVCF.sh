@@ -50,6 +50,16 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --standard_min_confidence_threshold_for_calling 30 \
 --standard_min_confidence_threshold_for_emitting 0 \
+--annotation AS_BaseQualityRankSumTest \
+--annotation AS_FisherStrand \
+--annotation AS_InbreedingCoeff \
+--annotation AS_MappingQualityRankSumTest \
+--annotation AS_QualByDepth \
+--annotation AS_RMSMappingQuality \
+--annotation AS_ReadPosRankSumTest \
+--annotation AS_StrandOddsRatio \
+--annotation FractionInformativeReads \
+--annotation StrandBiasBySample \
 --variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf"
@@ -70,6 +80,16 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 --standard_min_confidence_threshold_for_calling 30 \
 --standard_min_confidence_threshold_for_emitting 0 \
+--annotation AS_BaseQualityRankSumTest \
+--annotation AS_FisherStrand \
+--annotation AS_InbreedingCoeff \
+--annotation AS_MappingQualityRankSumTest \
+--annotation AS_QualByDepth \
+--annotation AS_RMSMappingQuality \
+--annotation AS_ReadPosRankSumTest \
+--annotation AS_StrandOddsRatio \
+--annotation FractionInformativeReads \
+--annotation StrandBiasBySample \
 --variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/RAW/$FAMILY".RAW.vcf" \

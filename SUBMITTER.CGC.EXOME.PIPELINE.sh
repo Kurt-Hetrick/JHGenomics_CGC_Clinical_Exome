@@ -83,6 +83,7 @@ $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/HC_BAM \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/INDEL/{FILTERED_ON_BAIT,FILTERED_ON_TARGET} \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/SNV/{FILTERED_ON_BAIT,FILTERED_ON_TARGET} \
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/MIXED/{FILTERED_ON_BAIT,FILTERED_ON_TARGET} \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/VCF/{FILTERED_ON_BAIT,FILTERED_ON_TARGET} \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/VCF/FILTERED_ON_BAIT/TABIX \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/GVCF \
@@ -357,10 +358,20 @@ CREATE_FAMILY_INFO_ARRAY ()
 FAMILY_INFO_ARRAY=(`awk '$19=="'$FAMILY'" {print $1,$19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
 }
 
+CREATE_FAMILY_SAMPLE_LIST ()
+{
+awk '$19=="'$FAMILY'" {print $8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort \
+| uniq \
+>| $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/$FAMILY/$FAMILY".sample.list"
+}
+
 for FAMILY in $( awk '{print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq ) ;
 do
 CREATE_FAMILY_INFO_ARRAY
 CREATE_GVCF_LIST
+CREATE_FAMILY_SAMPLE_LIST
 done
 
 ### Run GenotypeGVCF per Family
@@ -438,6 +449,258 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$SCRIPT_DIR'""/M.01_ADD_MORE_ANNOTATION.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'","'$PED_FILE'",$1,$2,$3"\n""sleep 3s"}'
 
+##### DOING VCF BREAKOUTS #####
+
+### SUBSETTING FROM COHORT (FAMILY PLUS CONTROL SET) VCF ###
+
+# FILTER TO JUST VARIANT SITES
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.01_FILTER_COHORT_VARIANT_ONLY_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY.log",\
+"'$SCRIPT_DIR'""/M.01-A.01_FILTER_COHORT_VARIANT_ONLY.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+# FILTER TO JUST PASSING VARIANT SITES
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.02_FILTER_COHORT_VARIANT_ONLY_PASS_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### SUBSETTING TO FAMILY ###
+
+## SUBSETTING TO FAMILY ALL SITES ###
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/M.01-A.03_FILTER_TO_FAMILY_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+## SUBSETTING TO FAMILY ALL VARIANT SITES ##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.04_FILTER_TO_FAMILY_VARIANTS_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS.log",\
+"'$SCRIPT_DIR'""/M.01-A.04_FILTER_TO_FAMILY_VARIANTS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+## SUBSETTING TO FAMILY PASSING VARIANTS ##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.05_FILTER_TO_FAMILY_VARIANTS_PASS_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.05_FILTER_TO_FAMILY_VARIANTS_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+### SUBSETTING TO SAMPLE VCFS ###
+
+## SUBSET TO SAMPLE VCF ALL SITES ##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.06_FILTER_TO_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/M.01-A.06_FILTER_TO_SAMPLE_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE VARIANTS ONLY 
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.07_FILTER_TO_SAMPLE_VARIANTS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS.log",\
+"'$SCRIPT_DIR'""/M.01-A.07_FILTER_TO_SAMPLE_VARIANTS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE PASSING VARIANTS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.08_FILTER_TO_SAMPLE_VARIANTS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.08_FILTER_TO_SAMPLE_VARIANTS_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE PASSING SNVS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_SNV_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.09_FILTER_TO_SAMPLE_SNV_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE PASSING INDELS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.10_FILTER_TO_INDEL_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_INDEL_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.10_FILTER_TO_SAMPLE_INDEL_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE PASSING MIXED
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.11_FILTER_TO_MIXED_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_MIXED_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.11_FILTER_TO_SAMPLE_MIXED_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 3s"}'
+
+## SUBSET TO TARGET SNV ONLY PASS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.12_FILTER_TO_SAMPLE_TARGET_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TARGET_SNV_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.12_FILTER_TO_SAMPLE_TARGET_SNV_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+## SUBSET TO TARGET INDEL ONLY PASS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.13_FILTER_TO_SAMPLE_TARGET_INDEL_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TARGET_INDEL_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.13_FILTER_TO_SAMPLE_TARGET_INDEL_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+## SUBSET TO TARGET MIXED ONLY PASS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.14_FILTER_TO_SAMPLE_TARGET_MIXED_ONLY_PASS_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TARGET_MIXED_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/M.01-A.14_FILTER_TO_SAMPLE_TARGET_MIXED_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+### TITV SECTION ###
+
+# BREAK DOWN TO ALL PASSING SNV THAT FALL IN TITV BED FILE
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.01_FILTER_TO_SAMPLE_TITV_VCF_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TITV_VCF.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.01_FILTER_TO_SAMPLE_TITV_VCF.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+# BREAK DOWN TO ALL PASSING SNV THAT FALL IN TITV BED FILE AND OVERLAP WITH DBSNP 129
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TITV_VCF_KNOWN.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+# BREAK DOWN TO ALL PASSING SNV THAT FALL IN TITV BED FILE AND DO NOT OVERLAP WITH DBSNP 129
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TITV_VCF_NOVEL.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+### RUN TITV FOR THE PASSING SNVS THAT FALL IN UCSC CODING REGIONS THAT TOUCH EITHER THE BED OR TARGET FILE
+
+## ALL SNVS TITV
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.01-A.01_TITV_ALL_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09-A.01_FILTER_TO_SAMPLE_TITV_VCF_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".RUN_TITV_ALL.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.01-A.01_TITV_ALL.sh",\
+"'$SAMTOOLS_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+## ALL KNOWN SNVS TITV
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.02-A.01_TITV_KNOWN_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".RUN_TITV_KNOWN.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.02-A.01_TITV_KNOWN.sh",\
+"'$SAMTOOLS_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
+## ALL NOVEL SNVS TITV
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.09-A.03-A.01_TITV_NOVEL_"$3"_"$2"_"$1,\
+"-hold_jid","M.01-A.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".RUN_TITV_NOVEL.log",\
+"'$SCRIPT_DIR'""/M.01-A.09-A.03-A.01_TITV_NOVEL.sh",\
+"'$SAMTOOLS_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 3s"}'
+
 ### QC REPORT PREP ###
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
@@ -446,10 +709,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
-"-hold_jid","H.005-A.001_DOC_CHROM_DEPTH_"$3"_"$1","\
-"H.006_COLLECT_MULTIPLE_METRICS_"$3"_"$1","\
-"H.007_COLLECT_HS_METRICS_"$3"_"$1","\
-"H.008-A.001_VERIFYBAMID_"$3"_"$1,\
+"-hold_jid","M.01-A.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
 "'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 3s"}'
