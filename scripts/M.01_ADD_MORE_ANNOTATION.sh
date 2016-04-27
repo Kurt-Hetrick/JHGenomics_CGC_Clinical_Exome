@@ -41,7 +41,6 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantAnnotator \
 -R $REF_GENOME \
 --disable_auto_index_creation_and_locking_when_reading_rods \
---useAllAnnotations \
 --annotation AlleleBalance \
 --annotation AlleleBalanceBySample \
 --annotation AlleleCountBySample \
