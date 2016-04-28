@@ -1,5 +1,7 @@
 #!/bin/bash
 
+module load sge
+
 SAMPLE_SHEET=$1
 PED_FILE=$2
 
@@ -383,6 +385,13 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17}' \
 | $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 unique 4 unique 5 \
 | awk 'BEGIN {FS="\t"}
 gsub (/,/,",H.001_HAPLOTYPE_CALLER_"$1"_",$3) \
+$3~"," \
+{print "qsub","-N","H.001-A.001_GENOTYPE_GVCF_"$2"_"$1,\
+"-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
+"'$SCRIPT_DIR'""/H.001-A.001_GENOTYPE_GVCF.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$4,$5"\n""sleep 3s"} \
+$3!~"," \
 {print "qsub","-N","H.001-A.001_GENOTYPE_GVCF_"$2"_"$1,\
 "-hold_jid","H.001_HAPLOTYPE_CALLER_"$1"_"$3,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".GENOTYPE_GVCF.log",\
@@ -547,7 +556,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 -k 3 \
 | uniq \
-| awk '{print "qsub","-N","M.01-A.08_FILTER_TO_SAMPLE_VARIANTS_"$3"_"$2"_"$1,\
+| awk '{print "qsub","-N","M.01-A.08_FILTER_TO_SAMPLE_VARIANTS_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS.log",\
 "'$SCRIPT_DIR'""/M.01-A.08_FILTER_TO_SAMPLE_VARIANTS_PASS.sh",\
@@ -623,6 +632,42 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 "-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TARGET_MIXED_ONLY_PASS.log",\
 "'$SCRIPT_DIR'""/M.01-A.14_FILTER_TO_SAMPLE_TARGET_MIXED_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE VCF ALL SITES ON TARGET##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_ALL_SITES_TARGET.log",\
+"'$SCRIPT_DIR'""/M.01-A.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE VARIANTS ONLY ON TARGET
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.16_FILTER_TO_SAMPLE_VARIANTS_TARGET_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_TARGET.log",\
+"'$SCRIPT_DIR'""/M.01-A.16_FILTER_TO_SAMPLE_VARIANTS_TARGET.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
+
+## SUBSET TO SAMPLE PASSING VARIANTS ON TARGET
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","M.01-A.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET_"$3"_"$2"_"$1,\
+"-hold_jid","M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS_TARGET.log",\
+"'$SCRIPT_DIR'""/M.01-A.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 3s"}'
 
 ### TITV SECTION ###
@@ -716,15 +761,28 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 
 ### END PROJECT TASKS ###
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 -k 3 \
+# | uniq \
+# | $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 \
+# | awk 'BEGIN {FS="\t"}
+# gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$3) \
+# {print "qsub","-N","X.01-X.01-END_PROJECT_TASKS_"$1,\
+# "-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3",""M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/LOGS/"$1".END_PROJECT_TASKS.log",\
+# "'$SCRIPT_DIR'""/X.01-X.01-END_PROJECT_TASKS.sh",\
+# "'$CORE_PATH'","'$DATAMASH_DIR'",$1"\n""sleep 3s"}'
+
+awk 'BEGIN {OFS="\t"} {print $1,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1 -k 2 \
 | uniq \
-| $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 \
+| $DATAMASH_DIR/datamash -s -g 1 collapse 2 \
 | awk 'BEGIN {FS="\t"}
-gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$3) \
+gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$2) \
 {print "qsub","-N","X.01-X.01-END_PROJECT_TASKS_"$1,\
-"-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3",""M.01_ADD_MORE_ANNOTATION_"$2"_"$1,\
+"-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$2,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$1".END_PROJECT_TASKS.log",\
 "'$SCRIPT_DIR'""/X.01-X.01-END_PROJECT_TASKS.sh",\
 "'$CORE_PATH'","'$DATAMASH_DIR'",$1"\n""sleep 3s"}'
