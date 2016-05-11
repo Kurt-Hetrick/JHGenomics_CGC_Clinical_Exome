@@ -39,12 +39,12 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T ApplyRecalibration \
 -R $REF_GENOME \
 --disable_auto_index_creation_and_locking_when_reading_rods \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 --ts_filter_level 99.9 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches" \
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
 -mode SNP \
--o $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".VQSR.SNP.vcf"
+-o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.SNP.vcf"
 
 END_APPLY_RECALIBRATION_SNP=`date '+%s'`
 
@@ -57,12 +57,12 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T ApplyRecalibration \
 -R $REF_GENOME \
 --disable_auto_index_creation_and_locking_when_reading_rods \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 --ts_filter_level 99.9 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches" \
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
 -mode SNP \
--o $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".VQSR.SNP.vcf" \
+-o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.SNP.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

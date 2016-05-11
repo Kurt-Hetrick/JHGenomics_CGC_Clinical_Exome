@@ -41,7 +41,7 @@ START_VARIANT_RECALIBRATOR_SNP=`date '+%s'`
 $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 -resource:hapmap,known=false,training=true,truth=true,prior=15.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/hapmap_3.3.b37.vcf \
 -resource:omni,known=false,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_omni2.5.b37.vcf \
 -resource:1000G,known=false,training=true,truth=false,prior=10.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_phase1.snps.high_confidence.b37.vcf \
@@ -70,9 +70,9 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -tranche 96.0 \
 -tranche 95.0 \
 -tranche 90.0 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches" \
--rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.R"
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
+-rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.R"
 
 END_VARIANT_RECALIBRATOR_SNP=`date '+%s'`
 
@@ -84,7 +84,7 @@ echo $FAMILY"_"$PROJECT",J.01,VARIANT_RECALIBRATOR_SNP,"$HOSTNAME","$START_VARIA
 echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 -resource:hapmap,known=false,training=true,truth=true,prior=15.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/hapmap_3.3.b37.vcf \
 -resource:omni,known=false,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_omni2.5.b37.vcf \
 -resource:1000G,known=false,training=true,truth=false,prior=10.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_phase1.snps.high_confidence.b37.vcf \
@@ -113,30 +113,30 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -tranche 96.0 \
 -tranche 95.0 \
 -tranche 90.0 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches" \
--rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.R" \
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
+-rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.R" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 ###################
 # Move the tranches PDF to TEMP so that it can be trashed.
-mv $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches.pdf" \
+mv $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches.pdf" \
 $CORE_PATH/$PROJECT/TEMP
 ###################
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal.idx" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal.idx" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.R" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.R" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.R.pdf" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.R.pdf" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

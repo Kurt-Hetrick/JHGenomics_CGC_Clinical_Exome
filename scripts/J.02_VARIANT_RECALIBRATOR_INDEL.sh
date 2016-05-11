@@ -42,7 +42,7 @@ START_VARIANT_RECALIBRATOR_INDEL=`date '+%s'`
 $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 -resource:mills,known=true,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.2/b37/Mills_and_1000G_gold_standard.indels.b37.vcf \
 --maxGaussians 4 \
 --disable_auto_index_creation_and_locking_when_reading_rods \
@@ -68,9 +68,9 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -tranche 96.0 \
 -tranche 95.0 \
 -tranche 90.0 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.tranches" \
--rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.R"
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.tranches" \
+-rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.R"
 
 END_VARIANT_RECALIBRATOR_INDEL=`date '+%s'`
 
@@ -82,7 +82,7 @@ echo $FAMILY"_"$PROJECT",J.01,VARIANT_RECALIBRATOR_INDEL,"$HOSTNAME","$START_VAR
 echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
---input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROL_PLUS_$FAMILY".RAW.vcf" \
+--input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
 -resource:mills,known=true,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.2/b37/Mills_and_1000G_gold_standard.indels.b37.vcf \
 --maxGaussians 4 \
 --disable_auto_index_creation_and_locking_when_reading_rods \
@@ -108,24 +108,24 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -tranche 96.0 \
 -tranche 95.0 \
 -tranche 90.0 \
--recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.recal" \
--tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.tranches" \
--rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.R" \
+-recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.recal" \
+-tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.tranches" \
+-rscriptFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.R" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.recal" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.recal" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.recal.idx" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.recal.idx" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.tranches" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.tranches" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.R" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.R" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.INDEL.R.pdf" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.INDEL.R.pdf" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

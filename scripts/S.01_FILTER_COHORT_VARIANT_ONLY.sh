@@ -43,7 +43,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --excludeNonVariants \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.vcf"
 
 END_FILTER_COHORT_VARIANT_ONLY=`date '+%s'`
@@ -58,7 +58,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --excludeNonVariants \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 

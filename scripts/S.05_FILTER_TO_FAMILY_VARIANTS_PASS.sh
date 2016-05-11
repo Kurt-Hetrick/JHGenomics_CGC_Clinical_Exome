@@ -44,7 +44,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --keepOriginalAC \
 --sample_file $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".sample.list" \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 --excludeNonVariants \
 --excludeFiltered \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.VARIANT_ONLY.PASS.vcf"
@@ -62,7 +62,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --keepOriginalAC \
 --sample_file $CORE_PATH/$PROJECT/$FAMILY/$FAMILY/$FAMILY".sample.list" \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 --excludeNonVariants \
 --excludeFiltered \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.VARIANT_ONLY.PASS.vcf" \
