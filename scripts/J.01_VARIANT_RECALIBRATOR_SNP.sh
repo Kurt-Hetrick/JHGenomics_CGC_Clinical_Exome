@@ -121,12 +121,13 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 ###################
+# Move the tranches PDF to TEMP so that it can be trashed.
 mv $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.tranches.pdf" \
 $CORE_PATH/$PROJECT/TEMP
 ###################
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal" \
->> $CORE_PATH/$PROJECT/REPORTS/PROJECT".CIDR.Analysis.MD5.txt"
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".HC.SNV.recal.idx" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

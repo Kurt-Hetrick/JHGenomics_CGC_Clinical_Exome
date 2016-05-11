@@ -636,6 +636,7 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 ### SUBSETTING FROM COHORT (FAMILY PLUS CONTROL SET) VCF ###
 
 # FILTER TO JUST VARIANT SITES
+# I think Molly might like this output, but if not, then don't have to generate it.
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
@@ -648,6 +649,8 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
 # FILTER TO JUST PASSING VARIANT SITES
+# I think statgen is using this for some of their programs
+# If not needed then don't generate
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
@@ -659,21 +662,8 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$SCRIPT_DIR'""/S.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-### SUBSETTING TO FAMILY ###
-
-## SUBSETTING TO FAMILY ALL SITES ###
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
-| uniq \
-| awk '{print "qsub","-N","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_ALL_SITES.log",\
-"'$SCRIPT_DIR'""/S.03_FILTER_TO_FAMILY_ALL_SITES.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
-
 ## SUBSETTING TO FAMILY ALL VARIANT SITES ##
+# I think Molly would like this, but if not and nobody uses then delete since Family ALL sites would contain everything anyways.
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
@@ -686,6 +676,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
 ## SUBSETTING TO FAMILY PASSING VARIANTS ##
+# If nobody uses it, then don't generate #
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
@@ -807,18 +798,6 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 "'$SCRIPT_DIR'""/S.14_FILTER_TO_SAMPLE_TARGET_MIXED_ONLY_PASS.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
-## SUBSET TO SAMPLE VCF ALL SITES ON TARGET##
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_ALL_SITES_TARGET.log",\
-"'$SCRIPT_DIR'""/S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
-
 ## SUBSET TO SAMPLE VARIANTS ONLY ON TARGET
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
@@ -919,6 +898,30 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 "'$SCRIPT_DIR'""/S.09-A.03-A.01_TITV_NOVEL.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
+## SUBSETTING TO FAMILY ALL SITES ###
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.03_FILTER_TO_FAMILY_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+## SUBSET TO SAMPLE VCF ALL SITES ON TARGET##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_ALL_SITES_TARGET.log",\
+"'$SCRIPT_DIR'""/S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
+
 ### QC REPORT PREP ###
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
@@ -927,25 +930,12 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
-"-hold_jid","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1",""S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
 "'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 1s"}'
 
 ### END PROJECT TASKS ###
-
-# awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
-# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-# | sort -k 1 -k 2 -k 3 \
-# | uniq \
-# | $DATAMASH_DIR/datamash -s -g 1,2 collapse 3 \
-# | awk 'BEGIN {FS="\t"}
-# gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$3) \
-# {print "qsub","-N","X.01-X.01-END_PROJECT_TASKS_"$1,\
-# "-hold_jid","X.01-QC_REPORT_PREP_"$1"_"$3",""P.01_VARIANT_ANNOTATOR_"$2"_"$1,\
-# "-o","'$CORE_PATH'/"$1"/LOGS/"$1".END_PROJECT_TASKS.log",\
-# "'$SCRIPT_DIR'""/X.01-X.01-END_PROJECT_TASKS.sh",\
-# "'$CORE_PATH'","'$DATAMASH_DIR'",$1"\n""sleep 1s"}'
 
 awk 'BEGIN {OFS="\t"} {print $1,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \

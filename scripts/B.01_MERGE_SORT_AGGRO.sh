@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 PICARD_DIR=$2
 CORE_PATH=$3
 
@@ -43,7 +43,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_MERGE_BAM=`date '+%s'`
 
-$JAVA_1_7/java -jar $PICARD_DIR/picard.jar MergeSamFiles \
+$JAVA_1_8/java -jar $PICARD_DIR/picard.jar MergeSamFiles \
 $INPUT \
 OUTPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".original.bam" \
 VALIDATION_STRINGENCY=SILENT \
@@ -58,7 +58,7 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT",B.01,MERGE_BAM,"$HOSTNAME","$START_MERGE_BAM","$END_MERGE_BAM \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $PICARD_DIR/MergeSamFiles.jar \
+echo $JAVA_1_8/java -jar $PICARD_DIR/MergeSamFiles.jar \
 $INPUT \
 OUTPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".original.bam" \
 VALIDATION_STRINGENCY=SILENT \

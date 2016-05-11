@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 PICARD_DIR=$2
 CORE_PATH=$3
 
@@ -40,7 +40,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_MARK_DUPLICATES=`date '+%s'`
 
-$JAVA_1_7/java -jar $PICARD_DIR/picard.jar MarkDuplicates \
+$JAVA_1_8/java -jar $PICARD_DIR/picard.jar MarkDuplicates \
 INPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".original.bam" \
 OUTPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".dup.bam" \
 VALIDATION_STRINGENCY=SILENT \
@@ -57,7 +57,7 @@ echo $SM_TAG"_"$PROJECT",C.01,MARK_DUPLICATES,"$HOSTNAME","$START_MARK_DUPLICATE
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/PICARD_DUPLICATES/$SM_TAG"_MARK_DUPLICATES.txt" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-echo $JAVA_1_7/java -jar $PICARD_DIR/picard.jar MarkDuplicates \
+echo $JAVA_1_8/java -jar $PICARD_DIR/picard.jar MarkDuplicates \
 INPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".original.bam" \
 OUTPUT=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".dup.bam" \
 VALIDATION_STRINGENCY=SILENT \

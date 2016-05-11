@@ -48,7 +48,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectTypeToInclude SNP \
 --excludeNonVariants \
 --excludeFiltered \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf"
 
 END_FILTER_TO_SAMPLE_SNV_PASS=`date '+%s'`
@@ -67,7 +67,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectTypeToInclude SNP \
 --excludeNonVariants \
 --excludeFiltered \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/VQSR/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROL_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
