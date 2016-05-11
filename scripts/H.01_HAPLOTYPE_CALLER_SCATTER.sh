@@ -61,18 +61,16 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation AS_FisherStrand \
 --annotation AS_InbreedingCoeff \
 --annotation AS_MappingQualityRankSumTest \
---annotation AS_QualByDepth \
 --annotation AS_RMSMappingQuality \
 --annotation AS_ReadPosRankSumTest \
 --annotation AS_StrandOddsRatio \
 --annotation FractionInformativeReads \
 --annotation StrandBiasBySample \
 --annotation StrandAlleleCountsBySample \
---annotation LowMQ \
---annotation NBaseCount \
 --annotation GCContent \
 --annotation AlleleBalanceBySample \
 --annotation AlleleBalance \
+--annotation LikelihoodRankSumTest \
 -pairHMM VECTOR_LOGLESS_CACHING \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG"."$CHROMOSOME".g.vcf"
 
@@ -97,18 +95,16 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation AS_FisherStrand \
 --annotation AS_InbreedingCoeff \
 --annotation AS_MappingQualityRankSumTest \
---annotation AS_QualByDepth \
 --annotation AS_RMSMappingQuality \
 --annotation AS_ReadPosRankSumTest \
 --annotation AS_StrandOddsRatio \
 --annotation FractionInformativeReads \
 --annotation StrandBiasBySample \
 --annotation StrandAlleleCountsBySample \
---annotation LowMQ \
---annotation NBaseCount \
 --annotation GCContent \
 --annotation AlleleBalanceBySample \
 --annotation AlleleBalance \
+--annotation LikelihoodRankSumTest \
 -pairHMM VECTOR_LOGLESS_CACHING \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG"."$CHROMOSOME".g.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
