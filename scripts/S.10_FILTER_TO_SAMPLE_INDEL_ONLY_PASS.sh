@@ -48,6 +48,8 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectTypeToInclude INDEL \
 --excludeNonVariants \
 --excludeFiltered \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_BAIT/$SM_TAG".INDEL.ON_BAIT.PASS.vcf"
 
@@ -64,9 +66,11 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --keepOriginalAC \
 --sample_name $SM_TAG \
---selectTypeToInclude SNP \
+--selectTypeToInclude INDEL \
 --excludeNonVariants \
 --excludeFiltered \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/INDEL/FILTERED_ON_BAIT/$SM_TAG".INDEL.ON_BAIT.PASS.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

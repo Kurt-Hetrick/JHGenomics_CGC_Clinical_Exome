@@ -49,6 +49,8 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --sample_name $SM_TAG \
 --excludeNonVariants \
 --excludeFiltered \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_TARGET/$SM_TAG".VARIANT_SITES.PASS.ON_TARGET.vcf"
 
@@ -68,6 +70,8 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --sample_name $SM_TAG \
 --excludeNonVariants \
 --excludeFiltered \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_TARGET/$SM_TAG".VARIANT_SITES.PASS.ON_TARGET.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

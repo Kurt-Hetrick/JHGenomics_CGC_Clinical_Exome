@@ -44,6 +44,8 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --keepOriginalAC \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --sample_name $SM_TAG \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.vcf.gz"
@@ -60,6 +62,8 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --keepOriginalAC \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --sample_name $SM_TAG \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.vcf.gz" \

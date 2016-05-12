@@ -45,6 +45,8 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --keepOriginalAC \
+--keepOriginalDP \
+--removeUnusedAlternates \
 -L $TARGET_BED \
 --sample_name $SM_TAG \
 --excludeNonVariants \
@@ -63,6 +65,8 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
 --keepOriginalAC \
+--keepOriginalDP \
+--removeUnusedAlternates \
 -L $TARGET_BED \
 --sample_name $SM_TAG \
 --excludeNonVariants \

@@ -46,6 +46,8 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --keepOriginalAC \
 -L $TARGET_BED \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --sample_name $SM_TAG \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_TARGET/$SM_TAG".ALL_SITES.ON_TARGET.vcf.gz"
@@ -63,6 +65,8 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --keepOriginalAC \
 -L $TARGET_BED \
+--keepOriginalDP \
+--removeUnusedAlternates \
 --sample_name $SM_TAG \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_TARGET/$SM_TAG".ALL_SITES.ON_TARGET.vcf.gz" \
