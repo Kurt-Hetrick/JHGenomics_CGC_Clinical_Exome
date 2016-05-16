@@ -57,6 +57,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --emitRefConfidence BP_RESOLUTION \
 --variant_index_type LINEAR \
 --variant_index_parameter 128000 \
+--max_alternate_alleles 3 \
 --annotation AS_BaseQualityRankSumTest \
 --annotation AS_FisherStrand \
 --annotation AS_InbreedingCoeff \
@@ -91,6 +92,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --emitRefConfidence BP_RESOLUTION \
 --variant_index_type LINEAR \
 --variant_index_parameter 128000 \
+--max_alternate_alleles 3 \
 --annotation AS_BaseQualityRankSumTest \
 --annotation AS_FisherStrand \
 --annotation AS_InbreedingCoeff \
