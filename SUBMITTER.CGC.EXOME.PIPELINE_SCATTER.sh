@@ -44,6 +44,7 @@ FORMAT_MANIFEST
 MERGE_PED_MANIFEST
 CREATE_SAMPLE_INFO_ARRAY
 MAKE_PROJ_DIR_TREE
+echo Project started at `date` >| $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/REPORTS/PROJECT_START_END_TIMESTAMP.txt
 }
 
 FORMAT_MANIFEST ()
@@ -922,6 +923,124 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 "'$SCRIPT_DIR'""/S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
+#####################################################################
+################ CONVERT VCF FILES TO TABLES ########################
+#####################################################################
+
+## CONVERT INITIAL JOINT CALLED VCF TO TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_COHORT_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.18_VARIANT_TO_TABLE_COHORT_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+## BGZIP INITIAL JOINT CALLED VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+## TABIX INDEX INITIAL JOINT CALLED VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+######### FAMILY ONLY ALL SITES FILE TO TABLE #################################
+
+## CONVERT FAMILY ONLY VCF TO TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.03-A.01_VARIANT_TO_TABLE_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_FAMILY_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.03-A.01_VARIANT_TO_TABLE_FAMILY_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+## BGZIP FAMILY ONLY VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.03-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.03-A.01_VARIANT_TO_TABLE_FAMILY_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.03-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+## TABIX INDEX FAMILY ONLY VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","S.03-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES_"$2"_"$1,\
+"-hold_jid","S.03-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.03-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+######### SAMPLE ONLY ALL SITES FILE TO TABLE #################################
+
+## CONVERT SAMPLE ONLY VCF TO TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","S.06-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-hold_jid","S.06_FILTER_TO_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".VARIANT_TO_TABLE_SAMPLE_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.06-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
+
+## BGZIP SAMPLE ONLY VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","S.06-A.01-A.01_VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-hold_jid","S.06-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.06-A.01-A.01_VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+## TABIX INDEX SAMPLE ONLY VCF TABLE##
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{print "qsub","-N","S.06-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-hold_jid","S.06-A.01-A.01_VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/S.06-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+######### FINISH UP #################
+
 ### QC REPORT PREP ###
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
@@ -930,7 +1049,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
-"-hold_jid","S.03_FILTER_TO_FAMILY_ALL_SITES_"$2"_"$1",""S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
+"-hold_jid","S.03-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES_"$2"_"$1",""S.06-A.01-A.01-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
 "'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 1s"}'
