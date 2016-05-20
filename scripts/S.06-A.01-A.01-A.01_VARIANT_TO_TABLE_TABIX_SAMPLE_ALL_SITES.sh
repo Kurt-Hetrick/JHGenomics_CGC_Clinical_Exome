@@ -6,7 +6,7 @@
 
 
 # tell sge to submit any of these queue when available
-#$ -q rnd.q,prod.q,test.q
+#$ -q test.q
 
 # tell sge that you are in the users current working directory
 #$ -cwd
@@ -36,7 +36,7 @@ SM_TAG=$5
 
 # Filter to just on all of the variants all
 
-START_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'
+START_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'`
 
 # not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
 # do an example of molten output to look at/show molly
@@ -46,11 +46,11 @@ $TABIX_DIR/tabix -s 1 -b 2 -e 2 -c C \
 $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.gz"
 
 
-END_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'
+END_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $FAMILY"_"$PROJECT",V.01,VARIANT_TO_TABLE_$SAMPLE_ALL_SITES,"$HOSTNAME","$START_VARIANT_TO_TABLE_TABIX_SAMPLE","$START_VARIANT_TO_TABLE_TABIX_SAMPLE \
+echo $FAMILY"_"$PROJECT",V.01,VARIANT_TO_TABLE_TABIX_"$SAMPLE"_ALL_SITES,"$HOSTNAME","$START_VARIANT_TO_TABLE_TABIX_SAMPLE","$START_VARIANT_TO_TABLE_TABIX_SAMPLE \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $TABIX_DIR/tabix -s 1 -b 2 -e 2 -c C \
@@ -59,4 +59,5 @@ $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
-# MD5 STUFF
+md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.gz.tbi" \
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

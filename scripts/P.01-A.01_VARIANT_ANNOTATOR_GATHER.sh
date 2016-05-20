@@ -6,7 +6,7 @@
 
 
 # tell sge to submit any of these queue when available
-#$ -q rnd.q,prod.q,test.q
+#$ -q test.q
 
 # tell sge that you are in the users current working directory
 #$ -cwd
@@ -76,7 +76,7 @@ END_VARIANT_ANNOTATOR_GATHER=`date '+%s'`
 
 HOSTNAME=`hostname`
 
-echo $FAMILY"_"$PROJECT",P.01-A.01,VARIANT_ANNOTATOR_GATHER,"$HOSTNAME","$START_GENOTYPE_GVCF_GATHER","$END_GENOTYPE_GVCF_GATHER \
+echo $FAMILY"_"$PROJECT",P.01-A.01,VARIANT_ANNOTATOR_GATHER,"$HOSTNAME","$START_VARIANT_ANNOTATOR_GATHER","$END_VARIANT_ANNOTATOR_GATHER \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
 echo $JAVA_1_7/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
@@ -111,3 +111,9 @@ org.broadinstitute.gatk.tools.CatVariants \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
+
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
+
+md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz.tbi" \
+>> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

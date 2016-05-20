@@ -6,7 +6,7 @@
 
 
 # tell sge to submit any of these queue when available
-#$ -q rnd.q,prod.q,test.q
+#$ -q test.q
 
 # tell sge that you are in the users current working directory
 #$ -cwd
@@ -223,8 +223,6 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --allowMissingData \
 --showFiltered \
 -o $CORE_PATH/$PROJECT/TEMP/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.txt" \
->> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
+>> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
-echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
-
-# MD5 STUFF
+echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

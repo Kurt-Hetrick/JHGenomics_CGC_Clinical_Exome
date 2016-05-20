@@ -1049,7 +1049,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
-"-hold_jid","S.03-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES_"$2"_"$1",""S.06-A.01-A.01-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
+"-hold_jid","S.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
 "'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 1s"}'
