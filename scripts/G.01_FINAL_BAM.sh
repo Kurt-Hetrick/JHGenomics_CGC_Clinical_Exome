@@ -46,6 +46,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \
 -BQSR $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/GATK_REPORT/$SM_TAG"_PERFORM_BQSR.bqsr" \
+--disable_indel_quals \
 -dt NONE \
 -EOQ \
 -nct 8 \
@@ -64,6 +65,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \
 -BQSR $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/GATK_REPORT/$SM_TAG"_PERFORM_BQSR.bqsr" \
 -dt NONE \
+--disable_indel_quals \
 -EOQ \
 -nct 8 \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \
