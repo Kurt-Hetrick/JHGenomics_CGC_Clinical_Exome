@@ -71,7 +71,7 @@ org.broadinstitute.gatk.tools.CatVariants \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".22.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".X.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".Y.g.vcf" \
---outputFile $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf"
+--outputFile $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.gz"
 
 END_HAPLOTYPE_CALLER_GATHER=`date '+%s'`
 
@@ -109,7 +109,7 @@ org.broadinstitute.gatk.tools.CatVariants \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".X.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".Y.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".MT.g.vcf" \
--o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf" \
+-o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.gz" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"

@@ -408,7 +408,7 @@ FAMILY_INFO_ARRAY=(`awk '$19=="'$FAMILY'" {print $1,$8,$19,$12,$17}' ~/CGC_PIPEL
 
 CREATE_GVCF_LIST ()
 {
-awk 'BEGIN {OFS="/"} $19=="'$FAMILY'" {print "'$CORE_PATH'",$1,$19,$8,"GVCF",$8".g.vcf"}' \
+awk 'BEGIN {OFS="/"} $19=="'$FAMILY'" {print "'$CORE_PATH'",$1,$19,$8,"GVCF",$8".g.vcf.gz"}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort \
 | uniq \
@@ -704,28 +704,30 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
 
 ## SUBSET TO SAMPLE VARIANTS ONLY 
+## REMOVING IT. MOLLY DOESN'T PLAN ON USING IT AND IT DOESN'T SEEM LIKE ANYONE WOULD WANT IT.
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.07_FILTER_TO_SAMPLE_VARIANTS_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS.log",\
-"'$SCRIPT_DIR'""/S.07_FILTER_TO_SAMPLE_VARIANTS.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 -k 3 \
+# | uniq \
+# | awk '{print "qsub","-N","S.07_FILTER_TO_SAMPLE_VARIANTS_"$3"_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS.log",\
+# "'$SCRIPT_DIR'""/S.07_FILTER_TO_SAMPLE_VARIANTS.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
 
 ## SUBSET TO SAMPLE PASSING VARIANTS
+## REMOVING IT. MOLLY DOESN'T PLAN ON USING IT AND IT DOESN'T SEEM LIKE ANYONE WOULD WANT IT.
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.08_FILTER_TO_SAMPLE_VARIANTS_PASS_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS.log",\
-"'$SCRIPT_DIR'""/S.08_FILTER_TO_SAMPLE_VARIANTS_PASS.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 -k 3 \
+# | uniq \
+# | awk '{print "qsub","-N","S.08_FILTER_TO_SAMPLE_VARIANTS_PASS_"$3"_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS.log",\
+# "'$SCRIPT_DIR'""/S.08_FILTER_TO_SAMPLE_VARIANTS_PASS.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4"\n""sleep 1s"}'
 
 ## SUBSET TO SAMPLE PASSING SNVS
 
@@ -800,28 +802,30 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
 ## SUBSET TO SAMPLE VARIANTS ONLY ON TARGET
+## REMOVING. MOLLY DOESN'T NEED AND NOBODY ELSE SHOULD NEED IT.
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.16_FILTER_TO_SAMPLE_VARIANTS_TARGET_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_TARGET.log",\
-"'$SCRIPT_DIR'""/S.16_FILTER_TO_SAMPLE_VARIANTS_TARGET.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 -k 3 \
+# | uniq \
+# | awk '{print "qsub","-N","S.16_FILTER_TO_SAMPLE_VARIANTS_TARGET_"$3"_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_TARGET.log",\
+# "'$SCRIPT_DIR'""/S.16_FILTER_TO_SAMPLE_VARIANTS_TARGET.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
 ## SUBSET TO SAMPLE PASSING VARIANTS ON TARGET
+## REMOVING. MOLLY DOESN'T NEED AND NOBODY ELSE SHOULD NEED IT.
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS_TARGET.log",\
-"'$SCRIPT_DIR'""/S.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 -k 3 \
+# | uniq \
+# | awk '{print "qsub","-N","S.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET_"$3"_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_VARIANTS_PASS_TARGET.log",\
+# "'$SCRIPT_DIR'""/S.17_FILTER_TO_SAMPLE_VARIANTS_PASS_TARGET.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
 ### TITV SECTION ###
 
