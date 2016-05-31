@@ -90,6 +90,12 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields STR \
 --fields MVLR \
 --fields ClippingRankSum \
+--fields OneKGP.AF \
+--fields OneKGP.EAS_AF \
+--fields OneKGP.AMR_AF \
+--fields OneKGP.AFR_AF \
+--fields OneKGP.EUR_AF \
+--fields OneKGP.SAS_AF \
 --genotypeFields AD \
 --genotypeFields DP \
 --genotypeFields GQ \
@@ -124,8 +130,11 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields EVENTLENGTH \
 --fields FILTER \
 --fields AC \
+--fields AC_Orig \
 --fields AN \
+--fields AN_Orig \
 --fields AF \
+--fields AF_Orig \
 --fields ABHet \
 --fields ABHom \
 --fields OND \
@@ -157,6 +166,12 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields STR \
 --fields MVLR \
 --fields ClippingRankSum \
+--fields OneKGP.AF \
+--fields OneKGP.EAS_AF \
+--fields OneKGP.AMR_AF \
+--fields OneKGP.AFR_AF \
+--fields OneKGP.EUR_AF \
+--fields OneKGP.SAS_AF \
 --genotypeFields AD \
 --genotypeFields DP \
 --genotypeFields GQ \

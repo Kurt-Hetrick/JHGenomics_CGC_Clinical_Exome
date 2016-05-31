@@ -33,7 +33,6 @@ PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
 
-
 # Filter to just on all of the variants all
 
 START_VARIANT_TO_TABLE_FAMILY=`date '+%s'`
@@ -92,6 +91,12 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields STR \
 --fields MVLR \
 --fields ClippingRankSum \
+--fields OneKGP.AF \
+--fields OneKGP.EAS_AF \
+--fields OneKGP.AMR_AF \
+--fields OneKGP.AFR_AF \
+--fields OneKGP.EUR_AF \
+--fields OneKGP.SAS_AF \
 --genotypeFields AD \
 --genotypeFields DP \
 --genotypeFields GQ \
@@ -123,11 +128,8 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields REF \
 --fields ALT \
 --fields QUAL \
---fields TYPE \
---fields MULTI-ALLELIC \
 --fields EVENTLENGTH \
 --fields FILTER \
---fields TRANSITION \
 --fields AC \
 --fields AC_Orig \
 --fields AN \
@@ -141,15 +143,13 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields HET \
 --fields HOM-VAR \
 --fields NO-CALL \
---fields NCC \
---fields VAR \
 --fields NSAMPLES \
---fields GQ \
 --fields GQ_MEAN \
 --fields GQ_STDDEV \
 --fields NDA \
 --fields Samples \
 --fields DP \
+--fields DP_Orig \
 --fields QD \
 --fields FS \
 --fields SOR \
@@ -162,35 +162,22 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --fields NEGATIVE_TRAIN_SITE \
 --fields GC \
 --fields FractionInformativeReads \
---fields DB \
 --fields HRun \
 --fields RPA \
 --fields RU \
 --fields STR \
---fields ExcessHet \
---fields HW \
---fields InbreedingCoeff \
---fields LikelihoodRankSum \
---fields MLEAC \
---fields MLEAF \
 --fields MVLR \
---fields TDT \
---fields AS_BaseQRankSum \
---fields AS_FS \
---fields AS_InbreedingCoeff \
---fields AS_MQ \
---fields AS_MQRankSum \
---fields AS_ReadPosRankSum \
---fields AS_SOR \
---fields BaseQRankSum \
 --fields ClippingRankSum \
---genotypeFields AB \
+--fields OneKGP.AF \
+--fields OneKGP.EAS_AF \
+--fields OneKGP.AMR_AF \
+--fields OneKGP.AFR_AF \
+--fields OneKGP.EUR_AF \
+--fields OneKGP.SAS_AF \
 --genotypeFields AD \
 --genotypeFields DP \
 --genotypeFields GQ \
 --genotypeFields GT \
---genotypeFields MLPSAC \
---genotypeFields MLPSAF \
 --genotypeFields PGT \
 --genotypeFields PID \
 --genotypeFields PL \
