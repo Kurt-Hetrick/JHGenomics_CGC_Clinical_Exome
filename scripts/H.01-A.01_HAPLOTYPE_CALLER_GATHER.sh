@@ -108,14 +108,13 @@ org.broadinstitute.gatk.tools.CatVariants \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".22.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".X.g.vcf" \
 --variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".Y.g.vcf" \
---variant $CORE_PATH/$PROJECT/TEMP/$SM_TAG".MT.g.vcf" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.gz" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.gz" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.idx" \
+md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/GVCF/$SM_TAG".g.vcf.gz.tbi" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

@@ -105,8 +105,6 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT",A.01,BWA_MEM,"$HOSTNAME","$START_BWA_MEM","$END_BWA_MEM \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-# I'm guessing the pipe screws up the echo. Need to look up how to echo a pipe.
-
 echo $BWA_DIR/bwa mem \
 -M \
 -t 4 \
