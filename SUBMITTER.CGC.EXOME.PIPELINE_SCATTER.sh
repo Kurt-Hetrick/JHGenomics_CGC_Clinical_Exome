@@ -746,31 +746,31 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "'$SCRIPT_DIR'""/S.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
 "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-## SUBSETTING TO FAMILY ALL VARIANT SITES ##
-# I think Molly would like this, but if not and nobody uses then delete since Family ALL sites would contain everything anyways.
+# ## SUBSETTING TO FAMILY ALL VARIANT SITES ##
+# # Molly does not need
+# 
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 \
+# | uniq \
+# | awk '{print "qsub","-N","S.04_FILTER_TO_FAMILY_VARIANTS_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS.log",\
+# "'$SCRIPT_DIR'""/S.04_FILTER_TO_FAMILY_VARIANTS.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
-| uniq \
-| awk '{print "qsub","-N","S.04_FILTER_TO_FAMILY_VARIANTS_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS.log",\
-"'$SCRIPT_DIR'""/S.04_FILTER_TO_FAMILY_VARIANTS.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
-
-## SUBSETTING TO FAMILY PASSING VARIANTS ##
-# If nobody uses it, then don't generate #
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
-| uniq \
-| awk '{print "qsub","-N","S.05_FILTER_TO_FAMILY_VARIANTS_PASS_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS_PASS.log",\
-"'$SCRIPT_DIR'""/S.05_FILTER_TO_FAMILY_VARIANTS_PASS.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+# ## SUBSETTING TO FAMILY PASSING VARIANTS ##
+# # Noboby needs #
+# 
+# awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+# ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+# | sort -k 1 -k 2 \
+# | uniq \
+# | awk '{print "qsub","-N","S.05_FILTER_TO_FAMILY_VARIANTS_PASS_"$2"_"$1,\
+# "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+# "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_TO_FAMILY_VARIANTS_PASS.log",\
+# "'$SCRIPT_DIR'""/S.05_FILTER_TO_FAMILY_VARIANTS_PASS.sh",\
+# "'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
 ### SUBSETTING TO SAMPLE VCFS ###
 
