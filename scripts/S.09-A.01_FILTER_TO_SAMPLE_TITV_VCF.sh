@@ -49,7 +49,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectTypeToInclude SNP \
 --excludeNonVariants \
 --excludeFiltered \
---variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf.gz" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".SNV.TITV_ALL.vcf"
 
 END_FILTER_TO_SAMPLE_TITV_VCF=`date '+%s'`
@@ -68,7 +68,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectTypeToInclude SNP \
 --excludeNonVariants \
 --excludeFiltered \
---variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf" \
+--variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf.gz" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".SNV.TITV_ALL.vcf" \
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
