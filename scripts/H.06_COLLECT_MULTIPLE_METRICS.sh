@@ -55,8 +55,7 @@ REFERENCE_SEQUENCE=$REF_GENOME \
 DB_SNP=$DBSNP \
 INTERVALS=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".OnTarget.picard_2.bed" \
 PROGRAM=CollectGcBiasMetrics \
-PROGRAM=CollectSequencingArtifactMetrics \
-PROGRAM=CollectQualityYieldMetrics
+PROGRAM=CollectSequencingArtifactMetrics
 
 END_COLLECT_MULTIPLE_METRICS=`date '+%s'`
 
@@ -74,7 +73,6 @@ DB_SNP=$DBSNP \
 INTERVALS=$CORE_PATH/$PROJECT/TEMP/$SM_TAG".OnTarget.picard_2.bed" \
 PROGRAM=CollectGcBiasMetrics \
 PROGRAM=CollectSequencingArtifactMetrics \
-PROGRAM=CollectQualityYieldMetrics \
 >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/$SM_TAG".COMMAND.LINES.txt"
@@ -189,12 +187,4 @@ mv -v $CORE_PATH/$PROJECT/TEMP/$SM_TAG".gc_bias.summary_metrics" \
 $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/GC_BIAS/SUMMARY/$SM_TAG".gc_bias.summary_metrics.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/GC_BIAS/SUMMARY/$SM_TAG".gc_bias.summary_metrics.txt" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
-
-# move quality yield metrics
-
-mv -v $CORE_PATH/$PROJECT/TEMP/$SM_TAG".quality_yield_metrics" \
-$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/QUALITY_YIELD/$SM_TAG".quality_yield_metrics.txt"
-
-md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/QUALITY_YIELD/$SM_TAG".quality_yield_metrics.txt" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
