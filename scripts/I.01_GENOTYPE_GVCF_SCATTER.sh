@@ -65,6 +65,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation StrandAlleleCountsBySample \
 --annotation LikelihoodRankSumTest \
 -L $CHROMOSOME \
+--excludeIntervals 1:145017822-145017822 \
 --variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW."$CHROMOSOME".vcf"
@@ -97,6 +98,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation StrandAlleleCountsBySample \
 --annotation LikelihoodRankSumTest \
 -L $CHROMOSOME \
+--excludeIntervals 1:145017822-145017822 \
 --variant $CONTROL_REPO/Control_GVCF.list \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW."$CHROMOSOME".vcf" \
