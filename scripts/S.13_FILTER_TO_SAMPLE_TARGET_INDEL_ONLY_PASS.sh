@@ -6,7 +6,7 @@
 
 
 # tell sge to submit any of these queue when available
-#$ -q test.q
+#$ -q prod.q,rnd.q,test.q
 
 # tell sge that you are in the users current working directory
 #$ -cwd
