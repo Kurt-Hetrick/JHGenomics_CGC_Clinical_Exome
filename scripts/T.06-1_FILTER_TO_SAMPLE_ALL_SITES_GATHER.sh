@@ -31,7 +31,8 @@ CORE_PATH=$3
 
 PROJECT=$4
 FAMILY=$5
-REF_GENOME=$6
+SM_TAG=$6
+REF_GENOME=$7
 
 # Filter to just on all of the variants all
 
