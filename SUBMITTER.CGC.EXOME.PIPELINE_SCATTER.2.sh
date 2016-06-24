@@ -547,9 +547,9 @@ BUILD_HOLD_ID_PATH_GENOTYPE_GVCF
 CALL_GENOTYPE_GVCF
 done
 
-################################################################
-
- # GATHER UP THE PER FAMILY PER CHROMOSOME GVCF FILES INTO A SINGLE FAMILY GVCF
+########################################################################################
+##### GATHER UP THE PER FAMILY PER CHROMOSOME GVCF FILES INTO A SINGLE FAMILY GVCF #####
+########################################################################################
 
 BUILD_HOLD_ID_PATH_GENOTYPE_GVCF_GATHER()
 {
@@ -586,9 +586,13 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 	echo sleep 1s
  done
 
-# ###############END VITO##################################
+##########################################################
+################END VITO##################################
+##########################################################
 
-### Run Variant Recalibrator for the SNP model, this is done in parallel with the INDEL model
+#####################################################################################################
+##### Run Variant Recalibrator for the SNP model, this is done in parallel with the INDEL model #####
+#####################################################################################################
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
@@ -704,47 +708,105 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 	echo sleep 1s
  done
 
-###############################
-##### DOING VCF BREAKOUTS #####
-###############################
-
-### SUBSETTING FROM COHORT (FAMILY PLUS CONTROL SET) VCF ###
-
-# FILTER TO JUST VARIANT SITES
-# I think Molly might like this output, but if not, then don't have to generate it.
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
-| uniq \
-| awk '{print "qsub","-N","S.01_FILTER_COHORT_VARIANT_ONLY_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY.log",\
-"'$SCRIPT_DIR'""/S.01_FILTER_COHORT_VARIANT_ONLY.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
-
-# FILTER TO JUST PASSING VARIANT SITES
-# I think statgen is using this for some of their programs
-# If not needed then don't generate
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
-| uniq \
-| awk '{print "qsub","-N","S.02_FILTER_COHORT_VARIANT_ONLY_PASS_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY_PASS.log",\
-"'$SCRIPT_DIR'""/S.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
-
-#################################################################################
-########### RUNNING FILTER TO FAMILY ALL SITES BY CHROMOSOME ####################
-#################################################################################
+############################################################################################################
+##### DO PER CHROMOSOME VARIANT TO TABLE FOR COHORT ########################################################
+############################################################################################################
 
 CREATE_FAMILY_ONLY_ARRAY ()
 {
 FAMILY_ONLY_ARRAY=(`awk '$19=="'$FAMILY'" {print $1,$19,$12,$17}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
 }
+
+CALL_VARIANT_TO_TABLE_COHORT_ALL_SITES ()
+{
+echo \
+qsub \
+-N P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}_$CHROMOSOME \
+-hold_jid P.01_VARIANT_ANNOTATOR_${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}_$CHROMOSOME \
+-o $CORE_PATH/${FAMILY_ONLY_ARRAY[0]}/${FAMILY_ONLY_ARRAY[1]}/LOGS/${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}.VARIANT_TO_TABLE_COHORT_ALL_SITES_$CHROMOSOME.log \
+$SCRIPT_DIR/P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_CHR.sh \
+$JAVA_1_7 $GATK_DIR $CORE_PATH \
+${FAMILY_ONLY_ARRAY[0]} ${FAMILY_ONLY_ARRAY[1]} ${FAMILY_ONLY_ARRAY[2]} $CHROMOSOME
+}
+
+for FAMILY in $(awk 'BEGIN {FS="\t"} {print $1}' $PED_FILE | sort | uniq );
+do
+CREATE_FAMILY_ONLY_ARRAY
+	for CHROMOSOME in {{1..22},{X,Y}}
+		do
+		CALL_VARIANT_TO_TABLE_COHORT_ALL_SITES
+		echo sleep 1s
+		done
+	done
+
+################################################################################################################
+##### GATHER PER CHROMOSOME VARIANT TO TABLE FOR COHORT ########################################################
+################################################################################################################
+
+BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_COHORT_GATHER ()
+{
+	for PROJECT in $(awk 'BEGIN {FS=","} NR>1 {print $1}' $SAMPLE_SHEET | sort | uniq )
+	do
+	HOLD_ID_PATH="-hold_jid "
+	for CHROMOSOME in {{1..22},{X,Y}};
+ 	do
+ 		HOLD_ID_PATH=$HOLD_ID_PATH"P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$FAMILY"_"$PROJECT"_"$CHROMOSOME","
+ 	done
+ done
+}
+
+CALL_VARIANT_TO_TABLE_COHORT_GATHER ()
+{
+echo \
+qsub \
+-N T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_GATHER_${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]} \
+ ${HOLD_ID_PATH} \
+ -o $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/${FAMILY_INFO_ARRAY[2]}/LOGS/${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]}.FILTER_TO_COHORT_ALL_SITES_GATHER.log \
+ $SCRIPT_DIR/T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_GATHER.sh \
+ $JAVA_1_7 $GATK_DIR $CORE_PATH \
+ ${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]}
+}
+
+for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
+ do
+	BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_COHORT_GATHER
+	CREATE_FAMILY_INFO_ARRAY
+	CALL_VARIANT_TO_TABLE_COHORT_GATHER
+	echo sleep 1s
+ done
+
+##############################################################################################################
+## BGZIP INITIAL JOINT CALLED VCF TABLE ######################################################################
+##############################################################################################################
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+##############################################################################################################
+## TABIX INDEX INITIAL JOINT CALLED VCF TABLE ################################################################
+##############################################################################################################
+
+awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 \
+| uniq \
+| awk '{print "qsub","-N","T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.log",\
+"'$SCRIPT_DIR'""/T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.sh",\
+"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+
+
+#################################################################################
+########### RUNNING FILTER TO FAMILY ALL SITES BY CHROMOSOME ####################
+#################################################################################
 
 CALL_FILTER_TO_FAMILY_ALL_SITES ()
 {
@@ -994,7 +1056,7 @@ CREATE_SAMPLE_INFO_ARRAY_2
 	done
 
 ################################################################################################################
-##### GATHER PER CHROMOSOME VARIANT TO TABLE FOR COHORT ########################################################
+##### GATHER PER CHROMOSOME VARIANT TO TABLE FOR SAMPLE ########################################################
 ################################################################################################################
 
 BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_SAMPLE_GATHER ()
@@ -1021,7 +1083,7 @@ qsub \
  ${SAMPLE_INFO_ARRAY_2[0]} ${SAMPLE_INFO_ARRAY_2[2]} ${SAMPLE_INFO_ARRAY_2[1]} ${SAMPLE_INFO_ARRAY_2[3]}
 }
 
-for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
+for SAMPLE in $(awk 'BEGIN {FS="\t"} {print $8}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
  do
 	BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_SAMPLE_GATHER
 	CREATE_SAMPLE_INFO_ARRAY_2
@@ -1057,96 +1119,105 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 "'$SCRIPT_DIR'""/T.06-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES.sh",\
 "'$TABIX_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-############################################################################################################
-##### DO PER CHROMOSOME VARIANT TO TABLE FOR FAMILY ########################################################
-############################################################################################################
+###########################################################################################
+########### RUNNING FILTER TO SAMPLE ALL SITES BY CHROMOSOME ON TARGET ####################
+###########################################################################################
 
-CALL_VARIANT_TO_TABLE_COHORT_ALL_SITES ()
+CREATE_SAMPLE_INFO_ARRAY_2 ()
+{
+SAMPLE_INFO_ARRAY_2=(`awk '$8=="'$SAMPLE'" {print $1,$8,$19,$12,$17}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
+}
+
+CALL_FILTER_TO_SAMPLE_ALL_SITES_ON_TARGET ()
 {
 echo \
 qsub \
--N P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}_$CHROMOSOME \
--hold_jid P.01_VARIANT_ANNOTATOR_${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}_$CHROMOSOME \
--o $CORE_PATH/${FAMILY_ONLY_ARRAY[0]}/${FAMILY_ONLY_ARRAY[1]}/LOGS/${FAMILY_ONLY_ARRAY[1]}_${FAMILY_ONLY_ARRAY[0]}.VARIANT_TO_TABLE_COHORT_ALL_SITES_$CHROMOSOME.log \
-$SCRIPT_DIR/P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_CHR.sh \
+-N P.01-A.05_FILTER_TO_SAMPLE_ALL_SITES_TARGET_${SAMPLE_INFO_ARRAY_2[1]}_${SAMPLE_INFO_ARRAY_2[0]}_$CHROMOSOME \
+-hold_jid P.01_VARIANT_ANNOTATOR_${SAMPLE_INFO_ARRAY_2[2]}_${SAMPLE_INFO_ARRAY_2[0]}_$CHROMOSOME \
+-o $CORE_PATH/${SAMPLE_INFO_ARRAY_2[0]}/${SAMPLE_INFO_ARRAY_2[2]}/${SAMPLE_INFO_ARRAY_2[1]}/LOGS/${SAMPLE_INFO_ARRAY_2[1]}_${SAMPLE_INFO_ARRAY_2[2]}_${SAMPLE_INFO_ARRAY_2[0]}.FILTER_TO_SAMPLE_ALL_SITES_TARGET_$CHROMOSOME.log \
+$SCRIPT_DIR/P.01-A.05_FILTER_TO_SAMPLE_ALL_SITES_TARGET_CHR.sh \
 $JAVA_1_7 $GATK_DIR $CORE_PATH \
-${FAMILY_ONLY_ARRAY[0]} ${FAMILY_ONLY_ARRAY[1]} ${FAMILY_ONLY_ARRAY[2]} $CHROMOSOME
+${SAMPLE_INFO_ARRAY_2[0]} ${SAMPLE_INFO_ARRAY_2[2]} ${SAMPLE_INFO_ARRAY_2[1]} ${SAMPLE_INFO_ARRAY_2[3]} ${SAMPLE_INFO_ARRAY_2[4]} $CHROMOSOME
 }
 
-for FAMILY in $(awk 'BEGIN {FS="\t"} {print $1}' $PED_FILE | sort | uniq );
+for SAMPLE in $(awk 'BEGIN {FS=","} NR>1 {print $8}' $SAMPLE_SHEET | sort | uniq );
 do
-CREATE_FAMILY_ONLY_ARRAY
+CREATE_SAMPLE_INFO_ARRAY_2
 	for CHROMOSOME in {{1..22},{X,Y}}
 		do
-		CALL_VARIANT_TO_TABLE_COHORT_ALL_SITES
+		CALL_FILTER_TO_SAMPLE_ALL_SITES_ON_TARGET
 		echo sleep 1s
 		done
 	done
 
-################################################################################################################
-##### GATHER PER CHROMOSOME VARIANT TO TABLE FOR COHORT ########################################################
-################################################################################################################
+###############################################################################################################
+##### GATHER UP THE PER SAMPLE PER CHROMOSOME FILTER TO SAMPLE VCF FILES ON TARGET INTO A SINGLE VCF FILE #####
+###############################################################################################################
 
-BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_COHORT_GATHER ()
+BUILD_HOLD_ID_PATH_FILTER_TO_SAMPLE_VCF_TARGET ()
 {
 	for PROJECT in $(awk 'BEGIN {FS=","} NR>1 {print $1}' $SAMPLE_SHEET | sort | uniq )
 	do
 	HOLD_ID_PATH="-hold_jid "
 	for CHROMOSOME in {{1..22},{X,Y}};
  	do
- 		HOLD_ID_PATH=$HOLD_ID_PATH"P.01-A.02_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$FAMILY"_"$PROJECT"_"$CHROMOSOME","
+ 		HOLD_ID_PATH=$HOLD_ID_PATH"P.01-A.05_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$SAMPLE"_"$PROJECT"_"$CHROMOSOME","
  	done
  done
 }
 
-
-CALL_VARIANT_TO_TABLE_COHORT_GATHER ()
+CALL_FILTER_TO_SAMPLE_VCF_TARGET_GATHER ()
 {
 echo \
 qsub \
--N T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_GATHER_${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]} \
+-N T.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_GATHER_${SAMPLE_INFO_ARRAY_2[1]}_${SAMPLE_INFO_ARRAY_2[2]}_${SAMPLE_INFO_ARRAY_2[0]} \
  ${HOLD_ID_PATH} \
- -o $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/${FAMILY_INFO_ARRAY[2]}/LOGS/${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]}.FILTER_TO_COHORT_ALL_SITES_GATHER.log \
- $SCRIPT_DIR/T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_GATHER.sh \
+ -o $CORE_PATH/${SAMPLE_INFO_ARRAY_2[0]}/${SAMPLE_INFO_ARRAY_2[2]}/${SAMPLE_INFO_ARRAY_2[1]}/LOGS/${SAMPLE_INFO_ARRAY_2[1]}_${SAMPLE_INFO_ARRAY_2[2]}_${SAMPLE_INFO_ARRAY_2[0]}.FILTER_TO_SAMPLE_ALL_SITES_TARGET_GATHER.log \
+ $SCRIPT_DIR/T.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_GATHER.sh \
  $JAVA_1_7 $GATK_DIR $CORE_PATH \
- ${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]}
+ ${SAMPLE_INFO_ARRAY_2[0]} ${SAMPLE_INFO_ARRAY_2[2]} ${SAMPLE_INFO_ARRAY_2[1]} ${SAMPLE_INFO_ARRAY_2[3]}
 }
 
-for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
+for SAMPLE in $(awk 'BEGIN {FS="\t"} {print $8}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
  do
-	BUILD_HOLD_ID_PATH_VARIANT_TO_TABLE_COHORT_GATHER
-	CREATE_FAMILY_INFO_ARRAY
-	CALL_VARIANT_TO_TABLE_COHORT_GATHER
+ 	BUILD_HOLD_ID_PATH_FILTER_TO_SAMPLE_VCF_TARGET
+	CREATE_SAMPLE_INFO_ARRAY_2
+	CALL_FILTER_TO_SAMPLE_VCF_TARGET_GATHER
 	echo sleep 1s
  done
 
-##############################################################################################################
-## BGZIP INITIAL JOINT CALLED VCF TABLE ######################################################################
-##############################################################################################################
+###############################
+##### DOING VCF BREAKOUTS #####
+###############################
 
-awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+### SUBSETTING FROM COHORT (FAMILY PLUS CONTROL SET) VCF ###
+
+# FILTER TO JUST VARIANT SITES
+# I think Molly might like this output, but if not, then don't have to generate it.
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 \
 | uniq \
-| awk '{print "qsub","-N","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
-"-hold_jid","T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.log",\
-"'$SCRIPT_DIR'""/T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES.sh",\
-"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+| awk '{print "qsub","-N","S.01_FILTER_COHORT_VARIANT_ONLY_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY.log",\
+"'$SCRIPT_DIR'""/S.01_FILTER_COHORT_VARIANT_ONLY.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-##############################################################################################################
-## TABIX INDEX INITIAL JOINT CALLED VCF TABLE ################################################################
-##############################################################################################################
+# FILTER TO JUST PASSING VARIANT SITES
+# I think statgen is using this for some of their programs
+# If not needed then don't generate
 
-awk 'BEGIN {OFS="\t"} {print $1,$19}' \
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 \
 | uniq \
-| awk '{print "qsub","-N","T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
-"-hold_jid","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.log",\
-"'$SCRIPT_DIR'""/T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES.sh",\
-"'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
+| awk '{print "qsub","-N","S.02_FILTER_COHORT_VARIANT_ONLY_PASS_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY_PASS.log",\
+"'$SCRIPT_DIR'""/S.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
+"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
 #################################
 ### SUBSETTING TO SAMPLE VCFS ###
@@ -1300,24 +1371,6 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 "'$SCRIPT_DIR'""/S.09-A.03-A.01_TITV_NOVEL.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
 
-#################################################
-## SUBSET TO SAMPLE VCF ALL SITES ON TARGET #####
-#####################################################################################################################
-## SEE HOW LONG THIS ONE TAKES...IT MIGHT NEED TO GO INTO A SCATTER GATHER...WHICH I'M REALLY BEGINNING TO HATE #####
-#####################################################################################################################
-## SO FAR IT IS TAKING 60-90 WALL CLOCK MINUTES...UP IN THE AIR AT THE MOMENT #######################################
-#####################################################################################################################
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{print "qsub","-N","S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET_"$3"_"$2"_"$1,\
-"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_ALL_SITES_TARGET.log",\
-"'$SCRIPT_DIR'""/S.15_FILTER_TO_SAMPLE_ALL_SITES_TARGET.sh",\
-"'$JAVA_1_7'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
-
 ######### FINISH UP #################
 
 ### QC REPORT PREP ###
@@ -1328,7 +1381,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
-"-hold_jid","T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
+"-hold_jid","T.06-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/LOGS/"$3"_"$1".QC_REPORT_PREP.log",\
 "'$SCRIPT_DIR'""/X.01-QC_REPORT_PREP.sh",\
 "'$SAMTOOLS_DIR'","'$CORE_PATH'","'$DATAMASH_DIR'",$1,$2,$3,$4,$5,$6,$7"\n""sleep 1s"}'
