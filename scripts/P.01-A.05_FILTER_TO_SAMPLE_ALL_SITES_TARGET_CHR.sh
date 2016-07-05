@@ -52,7 +52,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --keepOriginalDP \
 --removeUnusedAlternates \
 --sample_name $SM_TAG \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED."$CHROMOSOME".vcf" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".ALL_SITES.ON_TARGET."$CHROMOSOME".vcf"
 
 END_FILTER_TO_SAMPLE_ALL_SITES_TARGET=`date '+%s'`
@@ -73,7 +73,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --keepOriginalDP \
 --removeUnusedAlternates \
 --sample_name $SM_TAG \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+--variant $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED."$CHROMOSOME".vcf" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".ALL_SITES.ON_TARGET."$CHROMOSOME".vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
