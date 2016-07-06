@@ -45,7 +45,7 @@ $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY."$CHROMOSOME".vcf" \
+--variant $CORE_PATH/$PROJECT/TEMP/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY."$CHROMOSOME".vcf" \
 --fields CHROM \
 --fields POS \
 --fields ID \
@@ -122,7 +122,7 @@ echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
---variant $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY."$CHROMOSOME".vcf" \
+--variant $CORE_PATH/$PROJECT/TEMP/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY."$CHROMOSOME".vcf" \
 --fields CHROM \
 --fields POS \
 --fields ID \
