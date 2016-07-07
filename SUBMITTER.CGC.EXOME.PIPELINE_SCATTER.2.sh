@@ -938,7 +938,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 | sort -k 1 -k 2 \
 | uniq \
 | awk '{print "qsub","-N","T.03-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES_"$2"_"$1,\
-"-hold_jid","T.03-2-A.01_VARIANT_TO_TABLE_ALL_SITES_GATHER_"$2"_"$1,\
+"-hold_jid","T.03-2-A.01_VARIANT_TO_TABLE_FAMILY_ALL_SITES_GATHER_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES.log",\
 "'$SCRIPT_DIR'""/T.03-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES.sh",\
 "'$TABIX_DIR'","'$CORE_PATH'",$1,$2"\n""sleep 1s"}'
