@@ -37,9 +37,6 @@ FAMILY=$5
 SM_TAG=$6
 REF_GENOME=$7
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --Generate BQSR plots--
 
 START_ANALYZE_COVARIATES=`date '+%s'`

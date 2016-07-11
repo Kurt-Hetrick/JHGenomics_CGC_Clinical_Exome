@@ -34,9 +34,6 @@ PROJECT=$5
 FAMILY=$6
 SM_TAG=$7
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 # Format the cytoband file.
 # strip out the "chr" prefix from the chromsome name
 # print the chromsome, start, end, the first character of the cytoband (to get the chromosome arm).
@@ -78,10 +75,12 @@ sed 's/^chr//g' $CYTOBAND_BED \
 # group by SM_TAG,CHROMOSOME and sum up total coverage and interval lengths
 	# now we have statistics (total number of sequenced bases for all intervals per whole chromosome as well as per chromosome arm)
 	# and the length of bases attempted to be captured by whole chromosome and per chromosome arm
+	
+	# Below does calculate for X PAR, but I don't think that it removes PAR from the X calculation...
 
 awk 'BEGIN {FS=","};{OFS="\t"} $1~"-" {split($1,CHROM,":"); split(CHROM[2],POS,"-"); \
 print CHROM[1],POS[1]-1,POS[2],$2}' \
-$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/DEPTH_OF_COVERAGE/TARGET/$SM_TAG".TARGET.BED.sample_interval_summary.csv" \
+$CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/DEPTH_OF_COVERAGE/UCSC_CODING_PLUS_10bp/$SM_TAG".ALL_UCSC_CODING_10bpFlanks.csv" \
 | $BEDTOOLS_DIR/bedtools intersect -wo -a - -b $CORE_PATH/$PROJECT/TEMP/$SM_TAG".CHROM_ARM.bed" \
 | awk 'BEGIN {OFS="\t"} {if ($1=="X"&&$2<=2699520) print "'$SM_TAG'","X.PAR",$8,$4,$9 ; \
 else if ($1=="X"&&$2>=154931044) print "'$SM_TAG'","X.PAR",$8,$4,$9 ; \
@@ -101,11 +100,15 @@ $CORE_PATH/$PROJECT/TEMP/$SM_TAG".depth_per_chr_arm.txt" \
 
 # take the total coverages by chrom and chromosome arm, calcuate the mean depth for each sample,chr,arm combination
 # normalize by the AUTOSOMAL MEAN DEPTH
+# remove 21p, X.PARp and X.PARq
 
 awk 'BEGIN {print "SM_TAG","CHROM","ARM","TOTAL_COVERAGE","TOTAL_TARGETS","MEAN_DEPTH","NORM_DEPTH"} \
 {print $1,$2,$3,$4,$5,$4/$5,$4/$5/"'$AUTOSOMAL_MEAN_DEPTH'"}' \
 $CORE_PATH/$PROJECT/TEMP/$SM_TAG".depth_per_chr_arm.txt" \
 | sed 's/ /\t/g' \
+| awk '$2!="21"||$3!="p" {print $0}' \
+| awk '$2!="X.PAR"||$3!="p" {print $0}' \
+| awk '$2!="X.PAR"||$3!="q" {print $0}' \
 >| $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/ANEUPLOIDY_CHECK/$SM_TAG".chrom_count_report.txt"
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/ANEUPLOIDY_CHECK/$SM_TAG".chrom_count_report.txt" \

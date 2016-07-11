@@ -33,9 +33,6 @@ PROJECT=$4
 FAMILY=$5
 SM_TAG=$6
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --Mark Duplicates with Picard, write a duplicate report
 
 START_MARK_DUPLICATES=`date '+%s'`

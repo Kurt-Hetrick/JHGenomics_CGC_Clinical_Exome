@@ -36,9 +36,6 @@ REF_GENOME=$7
 KNOWN_INDEL_1=$8
 KNOWN_INDEL_2=$9
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --Realigner Target Creator, turn off downsampling
 
 START_REALIGNER_TARGET_CREATOR=`date '+%s'`

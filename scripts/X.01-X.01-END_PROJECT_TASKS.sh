@@ -128,15 +128,6 @@ sort -k 1 $CORE_PATH/$PROJECT/TEMP/PRE_ADAPTER.TXT \
 | sed 's/ /\t/g' \
 >| $CORE_PATH/$PROJECT/TEMP/PRE_ADAPTER_HEADER.TXT
 
-# Sorting concatenated pre adapter report by SM TAG and adding headers
-# 
-########## REMOVED ##################
-# sort -k 1 $CORE_PATH/$PROJECT/TEMP/QUALITY_YIELD_METRICS.TXT \
-# | uniq \
-# | awk 'BEGIN {print "SM_TAG","PCT_Q20_BASES","PCT_Q30_BASES"} {print $0}' \
-# | sed 's/ /\t/g' \
-# >| $CORE_PATH/$PROJECT/TEMP/QUALITY_YIELD_METRICS_HEADER.TXT
-
 # Sorting concatenated ON BAIT SNV metrics by SM TAG and adding headers
 
 sort -k 1 $CORE_PATH/$PROJECT/TEMP/BAIT_SNV_METRICS.TXT \

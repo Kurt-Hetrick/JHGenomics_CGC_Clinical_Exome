@@ -320,6 +320,19 @@ print "qsub","-N","H.03_DOC_CODING_10bpFLANKS_"$3"_"$1,\
 "'$SCRIPT_DIR'""/H.03_DOC_CODING_10bpFLANKS.sh",\
 "'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'","'$CODING_BED'","'$GENE_LIST'",$1,$2,$3,$4"\n""sleep 1s"}'
 
+# RUN ANEUPLOIDY_CHECK AFTER CODING PLUS 10 BP FLANKS FINISHES
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1 -k 2 -k 3 \
+| uniq \
+| awk '{split($3,smtag,"[@-]"); \
+print "qsub","-N","H.03-A.01_DOC_CHROM_DEPTH_"$3"_"$1,\
+"-hold_jid","H.03_DOC_CODING_10bpFLANKS_"$3"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".ANEUPLOIDY_CHECK.log",\
+"'$SCRIPT_DIR'""/H.03-A.01_CHROM_DEPTH.sh",\
+"'$CORE_PATH'","'$CYTOBAND_BED'","'$DATAMASH_DIR'","'$BEDTOOLS_DIR'",$1,$2,$3"\n""sleep 1s"}'
+
 # RUN DOC TARGET BED
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
@@ -333,22 +346,9 @@ print "qsub","-N","H.05_DOC_TARGET_BED_"$3"_"$1,\
 "'$SCRIPT_DIR'""/H.05_DOC_TARGET_BED.sh",\
 "'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'","'$GENE_LIST'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
 
-# RUN ANEUPLOIDY_CHECK AFTER DOC TARGET BED FINISHES
-
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
-~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
-| uniq \
-| awk '{split($3,smtag,"[@-]"); \
-print "qsub","-N","H.05-A.01_DOC_CHROM_DEPTH_"$3"_"$1,\
-"-hold_jid","H.05_DOC_TARGET_BED_"$3"_"$1,\
-"-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$1".ANEUPLOIDY_CHECK.log",\
-"'$SCRIPT_DIR'""/H.05-A.01_CHROM_DEPTH.sh",\
-"'$CORE_PATH'","'$CYTOBAND_BED'","'$DATAMASH_DIR'","'$BEDTOOLS_DIR'",$1,$2,$3"\n""sleep 1s"}'
-
 # RUN COLLECT MULTIPLE METRICS
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17,$16}' \
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 -k 3 \
 | uniq \
@@ -374,7 +374,7 @@ print "qsub","-N","H.07_COLLECT_HS_METRICS_"$3"_"$1,\
 
 # RUN SELECT VERIFYBAM ID VCF
 
-awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
+awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
 | sort -k 1 -k 2 -k 3 \
 | uniq \
@@ -404,7 +404,7 @@ print "qsub","-N","H.08-A.01_VERIFYBAMID_"$3"_"$1,\
 
 CREATE_SAMPLE_INFO_ARRAY_VERIFY_BAM ()
 {
-SAMPLE_INFO_ARRAY_VERIFY_BAM=(`awk '$8=="'$SAMPLE'" {print $1,$19,$8,$12,$16}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
+SAMPLE_INFO_ARRAY_VERIFY_BAM=(`awk '$8=="'$SAMPLE'" {print $1,$19,$8,$12,$14}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
 }
 
 CALL_SELECT_VERIFY_BAM ()
@@ -1457,17 +1457,3 @@ gsub (/,/,",X.01-QC_REPORT_PREP_"$1"_",$2) \
 # BARCODE_2D=${SM_TAG#*@} # no longer needed when using PHOENIX. used to needed to break out the "@" in the sm tag so it wouldn't break things.
 #
 ####################################################################################
-
-#### BOILERPLATE...I HAVE NOT DECIDED WHAT I AM GOING TO DO HERE######
-
-# function GRAB_MANIFEST {
-# sed 's/\r//g' $SAMPLE_SHEET \
-# | awk 'BEGIN {FS=","} NR>1 \
-# {split($19,INDEL,";");split($8,smtag,"@");print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$12,$15,$16,$17,$18,INDEL[1],INDEL[2]}'
-# }
-#
-# function GRAB_PROJECT_NAMES {
-# PROJECT_NAMES=`sed 's/\r//g' $SAMPLE_SHEET \
-# | awk 'BEGIN {FS=","} NR>1 print $1}'`
-# }
-######################################################################

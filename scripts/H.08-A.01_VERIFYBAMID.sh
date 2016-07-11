@@ -31,9 +31,6 @@ PROJECT=$3
 FAMILY=$4
 SM_TAG=$5
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --Running verifyBamID--
 
 START_VERIFYBAMID=`date '+%s'`

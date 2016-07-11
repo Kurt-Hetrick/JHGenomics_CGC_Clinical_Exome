@@ -33,9 +33,6 @@ PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## -----Haplotype Caller-----
 
 ## Call on Bait (padded or superset)

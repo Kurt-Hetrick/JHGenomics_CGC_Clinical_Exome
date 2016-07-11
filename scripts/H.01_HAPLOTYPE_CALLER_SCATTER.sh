@@ -36,9 +36,6 @@ REF_GENOME=$7
 BAIT_BED=$8
 CHROMOSOME=$9
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## -----Haplotype Caller-----
 
 ## Call on Bait (padded or superset)

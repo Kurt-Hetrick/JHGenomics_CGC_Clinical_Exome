@@ -37,12 +37,9 @@ REF_GENOME=$8
 BAIT_BED=$9
 TARGET_BED=${10}
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 BAIT_NAME=`basename $BAIT_BED .bed`
 
-# Calculate HS metrics bed files
+# Create Picard style Calculate bed files (1-based start)
 
 ($SAMTOOLS_DIR/samtools view -H $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \
 | grep "@SQ" ; sed 's/\r//g' $BAIT_BED | awk '{print $1,($2+1),$3,"+",$1"_"($2+1)"_"$3}' | sed 's/ /\t/g') \

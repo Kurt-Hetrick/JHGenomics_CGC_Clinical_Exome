@@ -34,9 +34,6 @@ FAMILY=$5
 SM_TAG=$6
 REF_GENOME=$7
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --write out file with new scores, retain old scores, no downsampling
 
 START_FINAL_BAM=`date '+%s'`

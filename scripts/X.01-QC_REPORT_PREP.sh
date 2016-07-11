@@ -189,18 +189,6 @@ grep -v "^#" $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/PRE_ADAPTER/SUMMARY/$SM
 | awk 'BEGIN {OFS="\t"} {print "'$SM_TAG'",$0}' \
 >> $CORE_PATH/$PROJECT/TEMP/PRE_ADAPTER.TXT
 
-# # GRABBING THE QUALITY YIELD REPORT. CHANGE COUNTS TO PERCENTAGES.
-## THIS IS THE HEADER ##
-## {print "SM_TAG","PCT_Q20_BASES","PCT_Q30_BASES"}
-##########################################
-##########################################
-### REMOVED ##############################
-##########################################
-
-# awk 'BEGIN {OFS="\t"} NR==8 {print "'$SM_TAG'",$7/$5*100,$9/$5*100}' \
-# $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/QUALITY_YIELD/$SM_TAG".quality_yield_metrics.txt" \
-# >> $CORE_PATH/$PROJECT/TEMP/QUALITY_YIELD_METRICS.TXT
-
 # GENERATE COUNT PCT,IN DBSNP FOR ON BAIT SNVS
 ## THIS IS THE HEADER ##
 # {print "SM_TAG""\t""COUNT_SNV_ON_BAIT""\t""PERCENT_SNV_ON_BAIT_SNP138"} 
@@ -269,46 +257,6 @@ END {print "'$SM_TAG'",INDEL_COUNT,(DBSNP_COUNT/INDEL_COUNT)*100,INDEL_BIALLELIC
 | sed 's/ /\t/g' \
 >> $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_METRICS.TXT
 
-# ##################################### EXAMPLE OF ABOVE
-# #### OLD #####
-################
-# (grep -v "^#" NA00857-1Bl-1-3.INDEL.ON_TARGET.PASS.vcf \
-# | awk '{INDEL_COUNT++NR} \
-# {INDEL_BIALLELIC+=($5!~",")} \
-# {DBSNP_COUNT+=($3~"rs")} \
-# {DBSNP_COUNT_BIALLELIC+=($3~"rs"&&$5!~",")} \
-# {BIG_INSERTION_BIALLELIC+=(length($5)-length($4))>15&&$5!~","} \
-# {BIG_INSERTION_BIALLELIC_DBSNP+=(length($5)-length($4))>15&&$5!~","&&$3~"rs"} \
-# {BIG_DELETION_BIALLELIC+=(length($5)-length($4))<-15&&$5!~","} \
-# {BIG_DELETION_BIALLELIC_DBSNP+=(length($5)-length($4))<-15&&$5!~","&&$3~"rs"} \
-# {SMALL_INSERTION_BIALLELIC+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","} \
-# {SMALL_INSERTION_BIALLELIC_DBSNP+=((length($5)-length($4))<=15&&(length($5)-length($4))>0)&&$5!~","&&$3~"rs"} \
-# {SMALL_DELETION_BIALLELIC+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","} \
-# {SMALL_DELETION_BIALLELIC_DBSNP+=((length($5)-length($4))>=-15&&(length($5)-length($4))<0)&&$5!~","&&$3~"rs"} \
-# {ONE_AND_TWO_BP_INSERTION_BIALLELIC+=((length($5)-length($4))<=2&&(length($5)-length($4))>0)&&$5!~","} \
-# {THREE_BP_INSERTION_BIALLELIC+=(length($5)-length($4))==3&&$5!~","} \
-# {ONE_AND_TWO_BP_DELETION_BIALLELIC+=((length($5)-length($4))>=-2&&(length($5)-length($4))<0)&&$5!~","} \
-# {THREE_BP_DELETION_BIALLELIC+=(length($5)-length($4))==-3&&$5!~","} \
-# END {print "SM_TAG",INDEL_COUNT,(DBSNP_COUNT/INDEL_COUNT)*100,INDEL_BIALLELIC,(DBSNP_COUNT_BIALLELIC/INDEL_BIALLELIC)*100,\
-# BIG_INSERTION_BIALLELIC,(BIG_INSERTION_BIALLELIC_DBSNP/BIG_INSERTION_BIALLELIC*100),BIG_DELETION_BIALLELIC,\
-# (BIG_DELETION_BIALLELIC_DBSNP/BIG_DELETION_BIALLELIC*100),\
-# SMALL_INSERTION_BIALLELIC,(SMALL_INSERTION_BIALLELIC_DBSNP/SMALL_INSERTION_BIALLELIC*100),SMALL_DELETION_BIALLELIC,\
-# (SMALL_DELETION_BIALLELIC_DBSNP/SMALL_DELETION_BIALLELIC*100),\
-# ((BIG_INSERTION_BIALLELIC+SMALL_INSERTION_BIALLELIC)/(BIG_DELETION_BIALLELIC+SMALL_DELETION_BIALLELIC)),\
-# (BIG_INSERTION_BIALLELIC/BIG_DELETION_BIALLELIC),(SMALL_INSERTION_BIALLELIC/SMALL_DELETION_BIALLELIC),\
-# (ONE_AND_TWO_BP_INSERTION_BIALLELIC/THREE_BP_INSERTION_BIALLELIC),\
-# (ONE_AND_TWO_BP_DELETION_BIALLELIC/THREE_BP_DELETION_BIALLELIC)}' \
-# ; grep -v "^#" NA00857-1Bl-1-3.INDEL.ON_TARGET.PASS.vcf \
-# | awk '$5!~","' \
-# | awk '{INDEL_SIZE=(length($5)-length($4))} \
-# {if (MIN_INDEL_SIZE==0) {MIN_INDEL_SIZE=MAX_INDEL_SIZE=INDEL_SIZE}; \
-# if(INDEL_SIZE>MAX_INDEL_SIZE) {MAX_INDEL_SIZE=INDEL_SIZE}; \
-# if(INDEL_SIZE<MIN_INDEL_SIZE) {MIN_INDEL_SIZE=INDEL_SIZE}} \
-# END {print MAX_INDEL_SIZE,MIN_INDEL_SIZE}') \
-# | paste - - \
-# | sed 's/ /\t/g' \
-# >> $CORE_PATH/$PROJECT/TEMP/BAIT_INDEL_METRICS.TXT
-# 
 # #####################################################
 
 # INDEL METRICS ON TARGET
@@ -350,32 +298,3 @@ END {if (MIXED_COUNT>=l) {print "'$SM_TAG'",MIXED_COUNT,(DBSNP_COUNT/MIXED_COUNT
 else {print "'$SM_TAG'","0","NaN"}}' \
 | sed 's/ /\t/g' \
 >> $CORE_PATH/$PROJECT/TEMP/TARGET_MIXED_METRICS.TXT
-
-# 
-# 
-# # # GRABBING ANNOVAR METRICS # Hopefully don't have to do this.
-# # 
-# # ls $CORE_PATH/$PROJECT/REPORTS/ANNOVAR/*txt \
-# # | awk '{split($1,SMtag,"/");print "awk \x27 BEGIN {FS=\x22\x5Ct\x22} \
-# # NR>6 \
-# # {total_snv+=($10~\x22Snv\x22)} \
-# # {total_indel+=($10!~\x22Snv\x22)} \
-# # {snv_126+=($10~\x22Snv\x22&&$55~\x22rs\x22)} \
-# # {indel_126+=($10!~\x22Snv\x22&&$55~\x22rs\x22)} \
-# # {snv_131+=($10~\x22Snv\x22&&$57~\x22rs\x22)} \
-# # {indel_131+=($10!~\x22Snv\x22&&$57~\x22rs\x22)} \
-# # END {print \x22"SMtag[9]"\x22,\
-# # (snv_126/total_snv*100),\
-# # (snv_131/total_snv*100),\
-# # (indel_126/total_indel*100),\
-# # (indel_131/total_indel*100)}\x27",\
-# # "'$CORE_PATH'""/""'$PROJECT'""/REPORTS/ANNOVAR/"SMtag[9]}' \
-# # | bash \
-# # | sed 's/_MS_OnBait_ANNOVAR_REPORT.txt//g' \
-# # | sed 's/ /\t/g' \
-# # | awk 'BEGIN {print "SM_TAG""\t""PERCENT_SNV_ON_BAIT_SNP126""\t""PERCENT_SNV_ON_BAIT_SNP131""\t"\
-# # "PERCENT_INDEL_ON_BAIT_SNP126""\t""PERCENT_INDEL_ON_BAIT_SNP131"} \
-# # {print $1"\t"$2"\t"$3"\t"$4"\t"$5}' \
-# # >| $CORE_PATH/$PROJECT/TEMP/ANNOVAR_METRICS.TXT
-# 
-
