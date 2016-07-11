@@ -41,10 +41,10 @@ START_VARIANT_TO_TABLE_BGZIP_SAMPLE=`date '+%s'`
 
 
 $TABIX_DIR/bgzip \
--c /home/sandbox/TEMP/$SM_TAG".ALL_SITES.txt" \
+-c /home/sandbox/$SM_TAG".ALL_SITES.txt" \
 >| $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.gz"
 
-rm -rvf /home/sandbox/TEMP/$SM_TAG".ALL_SITES.txt"
+rm -rvf /home/sandbox/$SM_TAG".ALL_SITES.txt"
 
 END_VARIANT_TO_TABLE_BGZIP_SAMPLE=`date '+%s'`
 
