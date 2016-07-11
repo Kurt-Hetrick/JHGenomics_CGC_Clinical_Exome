@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 VERIFY_VCF=$4
@@ -39,7 +39,7 @@ CHROMOSOME=${10}
 
 START_SELECT_VERIFYBAMID_VCF=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T SelectVariants \
 -R $REF_GENOME \
 --variant $VERIFY_VCF \
@@ -57,7 +57,7 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT"_BAM_REPORTS,Z.09,SELECT_VERIFYBAMID_"$CHROMOSOME","$HOSTNAME","$START_SELECT_VERIFYBAMID_VCF","$END_SELECT_VERIFYBAMID_VCF \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T SelectVariants \
 -R $REF_GENOME \
 --variant $VERIFY_VCF \

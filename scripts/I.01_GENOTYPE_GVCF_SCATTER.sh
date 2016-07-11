@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -44,7 +44,7 @@ CONTROL_REPO="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/dat
 
 START_GENOTYPE_GVCF=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T GenotypeGVCFs \
 -R $REF_GENOME \
 --dbsnp $DBSNP \
@@ -77,7 +77,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",I.01,GENOTYPE_GVCF_$CHROMOSOME,"$HOSTNAME","$START_GENOTYPE_GVCF","$END_GENOTYPE_GVCF \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T GenotypeGVCFs \
 -R $REF_GENOME \
 --dbsnp $DBSNP \

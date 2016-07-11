@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -47,7 +47,7 @@ START_HAPLOTYPE_CALLER=`date '+%s'`
 
 ### change annotation list
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T HaplotypeCaller \
 -R $REF_GENOME \
 --input_file $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \
@@ -82,7 +82,7 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT,H.01,HAPLOTYPE_CALLER_$CHROMOSOME,$HOSTNAME,$START_HAPLOTYPE_CALLER,$END_HAPLOTYPE_CALLER \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T HaplotypeCaller \
 -R $REF_GENOME \
 --input_file $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bam" \

@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -41,7 +41,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_FINAL_BAM=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T PrintReads \
 -R $REF_GENOME \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \
@@ -59,7 +59,7 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT",G.01,FINAL_BAM,"$HOSTNAME","$START_FINAL_BAM","$END_FINAL_BAM \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T PrintReads \
 -R $REF_GENOME \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \

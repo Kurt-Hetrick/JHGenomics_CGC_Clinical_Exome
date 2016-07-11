@@ -28,7 +28,7 @@ source /u01/home/khetrick/bashrc_change_R
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -44,7 +44,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_ANALYZE_COVARIATES=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T AnalyzeCovariates \
 -R $REF_GENOME \
 -before $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/GATK_REPORT/$SM_TAG"_PERFORM_BQSR.bqsr" \
@@ -58,7 +58,7 @@ HOSTNAME=`hostname`
 echo $SM_TAG"_"$PROJECT"_BAM_REPORTS,Z.01-A.01,ANALYZE_COVARIATES,"$HOSTNAME","$START_ANALYZE_COVARIATES","$END_ANALYZE_COVARIATES \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T AnalyzeCovariates \
 -R $REF_GENOME \
 -before $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/GATK_REPORT/$SM_TAG"_PERFORM_BQSR.bqsr" \

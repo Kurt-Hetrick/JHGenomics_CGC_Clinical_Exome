@@ -25,7 +25,7 @@
 set
 
 BWA_DIR=$1
-JAVA_1_7=$2
+JAVA_1_8=$2
 PICARD_DIR=$3
 CORE_PATH=$4
 
@@ -82,7 +82,7 @@ $BWA_DIR/bwa mem \
 $REF_GENOME \
 $FASTQ_1 \
 $FASTQ_2 \
-| $JAVA_1_7/java -jar \
+| $JAVA_1_8/java -jar \
 $PICARD_DIR/picard.jar AddOrReplaceReadGroups \
 INPUT=/dev/stdin \
 CREATE_INDEX=true \
@@ -111,7 +111,7 @@ echo $BWA_DIR/bwa mem \
 $REF_GENOME \
 $FASTQ_1 \
 $FASTQ_2 \
-\| $JAVA_1_7/java -jar \
+\| $JAVA_1_8/java -jar \
 $PICARD_DIR/picard.jar AddOrReplaceReadGroups \
 INPUT=/dev/stdin \
 CREATE_INDEX=true \

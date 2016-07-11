@@ -29,7 +29,7 @@ source /u01/home/khetrick/bashrc_change_R
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -39,7 +39,7 @@ REF_GENOME=$6
 
 START_VARIANT_RECALIBRATOR_INDEL=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
 --input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
@@ -79,7 +79,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",J.01,VARIANT_RECALIBRATOR_INDEL,"$HOSTNAME","$START_VARIANT_RECALIBRATOR_INDEL","$END_VARIANT_RECALIBRATOR_INDEL \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
 --input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \

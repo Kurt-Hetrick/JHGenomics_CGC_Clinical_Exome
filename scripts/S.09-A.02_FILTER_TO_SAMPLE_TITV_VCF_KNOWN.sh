@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -40,7 +40,7 @@ TITV_BED=$8
 
 START_FILTER_TO_SAMPLE_TITV_VCF_KNOWN=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T SelectVariants \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
@@ -58,7 +58,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",S.01,FILTER_TO_SAMPLE_TITV_VCF_KNOWN,"$HOSTNAME","$START_FILTER_TO_SAMPLE_TITV_VCF_KNOWN","$END_FILTER_TO_SAMPLE_TITV_VCF_KNOWN \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T SelectVariants \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \

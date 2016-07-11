@@ -28,7 +28,7 @@ set
 RIS_ID=${SM_TAG%@*}
 BARCODE_2D=${SM_TAG#*@}
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -46,7 +46,7 @@ BAIT_BED=${11}
 
 START_PERFORM_BQSR=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T BaseRecalibrator \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \
 -R $REF_GENOME \
@@ -67,7 +67,7 @@ echo $SM_TAG"_"$PROJECT",F.01,PERFORM_BQSR,"$HOSTNAME","$START_PERFORM_BQSR","$E
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/COUNT_COVARIATES/GATK_REPORT/$SM_TAG"_PERFORM_BQSR.bqsr" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T BaseRecalibrator \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".realign.bam" \
 -R $REF_GENOME \

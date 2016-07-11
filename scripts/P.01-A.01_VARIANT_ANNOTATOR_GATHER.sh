@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -42,7 +42,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_VARIANT_ANNOTATOR_GATHER=`date '+%s'`
 
-$JAVA_1_7/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
 org.broadinstitute.gatk.tools.CatVariants \
 -R $REF_GENOME \
 --assumeSorted \
@@ -79,7 +79,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",P.01-A.01,VARIANT_ANNOTATOR_GATHER,"$HOSTNAME","$START_VARIANT_ANNOTATOR_GATHER","$END_VARIANT_ANNOTATOR_GATHER \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
 org.broadinstitute.gatk.tools.CatVariants \
 -R $REF_GENOME \
 --assumeSorted \

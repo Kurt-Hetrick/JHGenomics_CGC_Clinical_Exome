@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -43,7 +43,7 @@ BARCODE_2D=${SM_TAG#*@}
 
 START_REALIGNER_TARGET_CREATOR=`date '+%s'`
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".dup.bam" \
 -R $REF_GENOME \
@@ -63,7 +63,7 @@ echo $SM_TAG"_"$PROJECT",D.01,REALIGNER_TARGET_CREATOR,"$HOSTNAME","$START_REALI
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/REPORTS/LOCAL_REALIGNMENT_INTERVALS/$SM_TAG"_LOCAL_REALIGNMENT_INTERVALS.intervals" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
 -I $CORE_PATH/$PROJECT/TEMP/$SM_TAG".dup.bam" \
 -R $REF_GENOME \

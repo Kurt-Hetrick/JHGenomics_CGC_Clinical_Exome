@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -41,7 +41,7 @@ START_VARIANT_TO_TABLE_COHORT=`date '+%s'`
 # not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
 # do an example of molten output to look at/show molly
 
-$JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \
@@ -117,7 +117,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",S.01,VARIANT_TO_TABLE_CONTROLS_PLUS_"$FAMILY"_ALL_SITES_"$CHROMOSOME","$HOSTNAME","$START_VARIANT_TO_TABLE_COHORT","$END_VARIANT_TO_TABLE_COHORT \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -R $REF_GENOME \

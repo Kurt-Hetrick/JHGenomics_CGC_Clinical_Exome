@@ -25,7 +25,7 @@
 
 set
 
-JAVA_1_7=$1
+JAVA_1_8=$1
 GATK_DIR=$2
 CORE_PATH=$3
 
@@ -38,7 +38,7 @@ CHROMOSOME=$7
 
 START_GATHER_FAMILY_ALL_SITES=`date '+%s'`
 
-$JAVA_1_7/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
+$JAVA_1_8/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
 org.broadinstitute.gatk.tools.CatVariants \
 -R $REF_GENOME \
 --assumeSorted \
@@ -75,7 +75,7 @@ HOSTNAME=`hostname`
 echo $FAMILY"_"$PROJECT",T.01,GATHER_FAMILY_ALL_SITES"$CHROMOSOME"_VCF,"$HOSTNAME","$START_GATHER_FAMILY_ALL_SITES","$END_GATHER_FAMILY_ALL_SITES \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".WALL.CLOCK.TIMES.csv"
 
-echo $JAVA_1_7/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
+echo $JAVA_1_8/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
 org.broadinstitute.gatk.tools.CatVariants \
 -R $REF_GENOME \
 --assumeSorted \
