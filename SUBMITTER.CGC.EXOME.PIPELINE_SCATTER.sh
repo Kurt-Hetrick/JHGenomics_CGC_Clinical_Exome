@@ -25,6 +25,11 @@ DATAMASH_DIR="/isilon/sequencing/Kurt/Programs/PATH"
 CYTOBAND_BED="/isilon/sequencing/Kurt/CGC/GRCh37.Cytobands.bed"
 # BEDTOOLS IS v2.22.0
 BEDTOOLS_DIR="/isilon/sequencing/Kurt/Programs/PATH"
+VCFTOOLS_DIR="/isilon/sequencing/Kurt/Programs/VCFtools/vcftools_0.1.12b/bin"
+PLINK2_DIR="/isilon/sequencing/Kurt/Programs/PLINK2"
+KING_DIR="/isilon/sequencing/Kurt/Programs/KING/Linux-king19"
+
+CONTROL_PED_FILE="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/data/CGC_CONTROL_SET.ped"
 
 #################################
 ##### MAKE A DIRECTORY TREE #####
@@ -104,8 +109,9 @@ $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/REPORTS/LOCAL_REALIGNMENT_INTERVALS \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/REPORTS/MEAN_QUALITY_BY_CYCLE/{METRICS,PDF} \
 $CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/${SAMPLE_INFO_ARRAY[2]}/REPORTS/ANEUPLOIDY_CHECK \
-$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/{LOGS,VCF} \
-$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/{TEMP,FASTQ,REPORTS,LOGS}
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/${SAMPLE_INFO_ARRAY[1]}/{LOGS,VCF,RELATEDNESS,PCA} \
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/{FASTQ,REPORTS,LOGS} \
+$CORE_PATH/${SAMPLE_INFO_ARRAY[0]}/TEMP/{VCF_PREP,PLINK,KING}
 }
 
 for SAMPLE in $(awk 'BEGIN {FS=","} NR>1 {print $8}' $SAMPLE_SHEET | sort | uniq );
@@ -830,7 +836,7 @@ CREATE_FAMILY_ONLY_ARRAY
 		echo sleep 1s
 		done
 	done
-	
+
 #####################################################################################################
 ##### GATHER UP THE PER FAMILY PER CHROMOSOME FILTER TO FAMILY VCF FILES INTO A SINGLE VCF FILE #####
 #####################################################################################################
@@ -1219,6 +1225,31 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_VARIANT_ONLY_PASS.log",\
 "'$SCRIPT_DIR'""/S.02_FILTER_COHORT_VARIANT_ONLY_PASS.sh",\
 "'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+# FILTER TO JUST PASSING BIALLELIC SNV SITES
+# TEMPORARY FILE USED FOR PCA AND RELATEDNESS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1,1 -k 2,2 \
+| uniq \
+| awk '{print "qsub","-N","S.03_FILTER_COHORT_SNV_ONLY_PASS_BIALLELIC_"$2"_"$1,\
+"-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".FILTER_COHORT_SNV_ONLY_PASS_BIALLELIC.log",\
+"'$SCRIPT_DIR'""/S.03_FILTER_COHORT_SNV_ONLY_PASS_BIALLELIC.sh",\
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+
+# RUN HUAS WORKFLOW FOR PCA AND RELATEDNESS
+
+awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
+~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
+| sort -k 1,1 -k 2,2 \
+| uniq \
+| awk '{print "qsub","-N","S.03-A.01_PCA_RELATEDNESS_"$2"_"$1,\
+"-hold_jid","S.03_FILTER_COHORT_SNV_ONLY_PASS_BIALLELIC_"$2"_"$1,\
+"-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".PCA_RELATEDNESS.log",\
+"'$SCRIPT_DIR'""/S.03-A.01_PCA_RELATEDNESS.sh",\
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'","'$VCFTOOLS_DIR'","'$PLINK2_DIR'","'$KING_DIR'",$1,$2,$3,"'$PED_FILE'","'$CONTROL_PED_FILE'""\n""sleep 1s"}'
 
 #################################
 ### SUBSETTING TO SAMPLE VCFS ###
