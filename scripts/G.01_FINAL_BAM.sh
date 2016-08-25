@@ -84,12 +84,3 @@ echo $SM_TAG"_"$PROJECT",G.01-A.01,FINAL_BAM_MD5,"$HOSTNAME","$START_FINAL_BAM_M
 
 md5sum $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/BAM/$SM_TAG".bai" \
 >> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
-
-#### The below came out with GATK 3.5. Still haven't implemented it, but can if wanting to cut down file size.
-
-# Disable indel quality scores. The Base Recalibration process produces indel quality scores in addition to the regular base qualities. They are stored
-# in the BI and BD tags of the read records, taking up a substantial amount of space in the resulting BAM files. There has been a lot of discussion about
-# whether these indel quals are worth the file size inflation. Well, we’ve done a lot of testing and we’ve now decided that no, for most use cases the
-# indel quals don’t make enough of a difference to justify the extra file size. The one exception to this is when processing PacBio data, it seems that
-# indel quals may help model the indel-related errors of that technology. But for the rest, we’re now comfortable recommending the use of the --
-# disable_indel_quals argument when writing out the recalibrated BAM file with PrintReads.

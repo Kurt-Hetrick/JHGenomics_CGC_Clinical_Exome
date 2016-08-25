@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,12 +33,9 @@ FAMILY=$5
 REF_GENOME=$6
 CHROMOSOME=$7
 
-# Filter to just on all of the variants all
-
 START_VARIANT_TO_TABLE_COHORT=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
+# Convert the controls plus family samples all sites vcf into a tab-delimited specifically for fields that Molly might find useful for sorting/filtering
 
 $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \

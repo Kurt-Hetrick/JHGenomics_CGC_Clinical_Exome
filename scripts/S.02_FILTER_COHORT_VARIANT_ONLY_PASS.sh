@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -33,8 +32,7 @@ PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
 
-
-# Filter to just on all of the variants all
+# Filter cohort to passing only variants
 
 START_FILTER_COHORT_VARIANT_ONLY_PASS=`date '+%s'`
 
@@ -44,6 +42,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --excludeNonVariants \
 --excludeFiltered \
+-nt 4 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/VCF/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.PASS.vcf"
 
@@ -60,8 +59,9 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
 --excludeNonVariants \
 --excludeFiltered \
+-nt 4 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
--o $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.PASS.vcf" \
+-o $CORE_PATH/$PROJECT/$FAMILY/VCF/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.PASS.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -32,17 +31,16 @@ PROJECT=$3
 FAMILY=$4
 SM_TAG=$5
 
-# Filter to just on all of the variants all
-
 START_VARIANT_TO_TABLE_BGZIP_SAMPLE=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
-
+# compress the table with bgzip
 
 $TABIX_DIR/bgzip \
 -c /home/sandbox/$SM_TAG".ALL_SITES.txt" \
 >| $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.gz"
+
+# delete the uncompressed file that is on the sandbox.
+# not doing this on the cgc side, b/c it does not have the i/o problems that cidr's production environment does so the read/write is all on isilon
 
 rm -rvf /home/sandbox/$SM_TAG".ALL_SITES.txt"
 

@@ -36,9 +36,6 @@ FAMILY=$7
 SM_TAG=$8
 REF_GENOME=$9
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ### --Depth of Coverage ALL UCSC CODING EXONS PLUS 10 BP FLANKS--
 
 START_DOC_CODING=`date '+%s'`

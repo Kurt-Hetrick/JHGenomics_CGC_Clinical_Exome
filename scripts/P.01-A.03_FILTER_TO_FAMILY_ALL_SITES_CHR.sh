@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,7 +33,7 @@ FAMILY=$5
 REF_GENOME=$6
 CHROMOSOME=$7
 
-# Filter to just on all of the variants all
+# Filter to all sites per family per chromosome
 
 START_FILTER_TO_FAMILY_ALL_SITES=`date '+%s'`
 

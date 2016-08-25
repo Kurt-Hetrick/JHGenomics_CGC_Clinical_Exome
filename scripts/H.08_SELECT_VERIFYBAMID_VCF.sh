@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,9 +34,6 @@ FAMILY=$6
 SM_TAG=$7
 REF_GENOME=$8
 TI_TV_BED=$9
-
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
 
 ## --Creating an on the fly VCF file to be used as the reference for verifyBamID--
 ## --remove X and Y data

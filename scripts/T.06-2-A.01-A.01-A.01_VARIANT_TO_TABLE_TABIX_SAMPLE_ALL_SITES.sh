@@ -32,17 +32,12 @@ PROJECT=$3
 FAMILY=$4
 SM_TAG=$5
 
-# Filter to just on all of the variants all
-
 START_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
-
+# Index the table created from the vcf file
 
 $TABIX_DIR/tabix -s 1 -b 2 -e 2 -c C \
 $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/VCF/FILTERED_ON_BAIT/$SM_TAG".ALL_SITES.txt.gz"
-
 
 END_VARIANT_TO_TABLE_TABIX_SAMPLE=`date '+%s'`
 

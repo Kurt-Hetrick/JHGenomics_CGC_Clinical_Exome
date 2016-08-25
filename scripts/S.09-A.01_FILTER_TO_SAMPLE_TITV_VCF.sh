@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,7 +33,6 @@ FAMILY=$5
 SM_TAG=$6
 REF_GENOME=$7
 TITV_BED=$8
-
 
 # Filter to just on all of the variants all
 

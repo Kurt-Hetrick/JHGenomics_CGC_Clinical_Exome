@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -31,17 +30,12 @@ CORE_PATH=$2
 PROJECT=$3
 FAMILY=$4
 
-# Filter to just on all of the variants all
-
 START_VARIANT_TO_TABLE_TABIX_FAMILY=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
-
+# index the bgzipped family level vcf to table file
 
 $TABIX_DIR/tabix -s 1 -b 2 -e 2 -c C \
 $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.txt.gz"
-
 
 END_VARIANT_TO_TABLE_TABIX_FAMILY=`date '+%s'`
 

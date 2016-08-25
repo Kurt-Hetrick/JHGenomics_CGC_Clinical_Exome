@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,7 +34,7 @@ SM_TAG=$6
 REF_GENOME=$7
 CHROMOSOME=$8
 
-# Filter to just on all of the variants all
+# Filter to all site per sample per chromosome
 
 START_FILTER_TO_SAMPLE_ALL_SITES=`date '+%s'`
 

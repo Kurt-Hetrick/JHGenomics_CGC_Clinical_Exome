@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,13 +34,14 @@ FAMILY=$4
 
 START_VARIANT_TO_TABLE_BGZIP_FAMILY=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
-
+# bgzip the per family vcf converted into a table file
 
 $TABIX_DIR/bgzip \
 -c /home/sandbox/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.txt" \
 >| $CORE_PATH/$PROJECT/$FAMILY/VCF/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.txt.gz"
+
+# delete the uncompressed version of the table since it is being written to the sandbox.
+# not doing this on the cgc side since the file i/o is not as bad as on cidr's production side and thus everything is being read/written on isilon
 
 rm -rvf /home/sandbox/$FAMILY".VQSR.ANNOTATED.JUST_FAMILY.txt"
 

@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,10 +33,6 @@ FAMILY=$4
 # Filter to just on all of the variants all
 
 START_VARIANT_TO_TABLE_BGZIP_COHORT=`date '+%s'`
-
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
-
 
 $TABIX_DIR/bgzip \
 -c /home/sandbox/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.txt" \

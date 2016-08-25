@@ -36,9 +36,6 @@ INPUT_BAM_FILE_STRING=$7
 
 INPUT=`echo $INPUT_BAM_FILE_STRING | sed 's/,/ /g'`
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
 ## --Merge and Sort Bam files--
 
 START_MERGE_BAM=`date '+%s'`

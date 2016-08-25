@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,12 +34,9 @@ SM_TAG=$6
 REF_GENOME=$7
 CHROMOSOME=$8
 
-# Filter to just on all of the variants all
-
 START_VARIANT_TO_TABLE_SAMPLE=`date '+%s'`
 
-# not doing --splitMultiallelic here...maybe do one as an example and discuss with Molly
-# do an example of molten output to look at/show molly
+# Turn the vcf file into a tab delimited text file outputting specific fields that molly can then sort/filter on
 
 $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantsToTable \

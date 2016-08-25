@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -31,7 +30,6 @@ CORE_PATH=$2
 PROJECT=$3
 FAMILY=$4
 SM_TAG=$5
-
 
 # Filter to just on all of the variants all
 

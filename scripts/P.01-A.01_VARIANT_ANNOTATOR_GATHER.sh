@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -33,9 +32,7 @@ PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
 
-## -----Haplotype Caller-----
-
-## Call on Bait (padded or superset)
+# Gather up the per chromosome vcf files that have had extra annotations added to it.
 
 START_VARIANT_ANNOTATOR_GATHER=`date '+%s'`
 

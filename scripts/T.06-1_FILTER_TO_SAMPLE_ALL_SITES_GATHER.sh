@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,9 +33,9 @@ FAMILY=$5
 SM_TAG=$6
 REF_GENOME=$7
 
-# Filter to just on all of the variants all
-
 START_GATHER_SAMPLE_ALL_SITES=`date '+%s'`
+
+# Gather the per sample all sites per chromosome vcf files
 
 $JAVA_1_8/java -cp $GATK_DIR/GenomeAnalysisTK.jar \
 org.broadinstitute.gatk.tools.CatVariants \

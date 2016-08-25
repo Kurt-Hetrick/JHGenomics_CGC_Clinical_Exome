@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q rnd.q,prod.q,prod.q,rnd.q,test.q
 
@@ -24,6 +23,7 @@
 # redirecting stderr/stdout to file as a log.
 
 set
+
 CORE_PATH=$1
 
 PROJECT=$2

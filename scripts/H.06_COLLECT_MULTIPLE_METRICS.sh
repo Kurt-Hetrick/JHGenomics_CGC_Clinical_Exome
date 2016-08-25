@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -36,8 +35,6 @@ SM_TAG=$7
 REF_GENOME=$8
 DBSNP=$9
 TI_TV_BED=${10}
-
-# blah, blah, blah
 
 # Create a picard style target bed file. This is used for CollectSequencingArtifactMetrics...it should not be used for anything else...i think
 
