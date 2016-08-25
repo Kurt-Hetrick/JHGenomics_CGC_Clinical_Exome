@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,9 +33,9 @@ FAMILY=$5
 SM_TAG=$6
 REF_GENOME=$7
 TITV_BED=$8
+DBSNP_129=$9
 
-
-# Filter to just on all of the variants all
+# Filter to passing SNVs within the TITV BED file that are not in dbSNP 129
 
 START_FILTER_TO_SAMPLE_TITV_VCF_NOVEL=`date '+%s'`
 
@@ -47,7 +46,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -L $TITV_BED \
 --excludeNonVariants \
 --excludeFiltered \
---discordance /isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.excluding_sites_after_129.vcf \
+--discordance $DBSNP_129 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf.gz" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".SNV.TITV_NOVEL.vcf"
 
@@ -65,7 +64,7 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -L $TITV_BED \
 --excludeNonVariants \
 --excludeFiltered \
---discordance /isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.excluding_sites_after_129.vcf \
+--discordance $DBSNP_129 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_BAIT/$SM_TAG".SNV.ON_BAIT.PASS.vcf.gz" \
 -o $CORE_PATH/$PROJECT/TEMP/$SM_TAG".SNV.TITV_NOVEL.vcf" \
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"

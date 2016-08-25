@@ -54,9 +54,16 @@ awk 1 $PED_FILE \
 | cat $CORE_PATH/$PROJECT/TEMP/"CONTROL_PED_FILE_FOR_"$FAMILY".ped" /dev/stdin \
 >| $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".ped"
 
-## 01. Subset BiAllelic SNVs with global MAF > 0.1 ##
+#############################################################################
+##### 01. Subset BiAllelic SNVs with global MAF from 1000 genomes > 0.1 #####
+#############################################################################
+
+### First Reformat the OneKGP.AF tag to OneKGP_AF b/c GATK will not recognize foo.bar correctly and will just look for foo.
+
 sed 's/OneKGP.AF/OneKGP_AF/g' $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.SNV_ONLY.PASS.BIALLELIC.vcf" \
 	>| $CORE_PATH/$PROJECT/TEMP/VCF_PREP/${FAMILY}.VQSR.PASS.SNV.reformat.vcf
+
+### Extract SNVS with One thousand genome MAF > 0.1 (10 percent)
 
 $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -R $REF_GENOME \
@@ -65,7 +72,10 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --selectexpressions 'OneKGP_AF > 0.1' \
 -o $CORE_PATH/$PROJECT/TEMP/VCF_PREP/${FAMILY}.VQSR.PASS.SNV.OneKG_AF.vcf
 
-## 02. Convert vcf to PLINK file ##
+#########################################
+##### 02. Convert vcf to PLINK file #####
+#########################################
+
 $VCFTOOLS_DIR/vcftools \
 --vcf $CORE_PATH/$PROJECT/TEMP/VCF_PREP/${FAMILY}.VQSR.PASS.SNV.OneKG_AF.vcf \
 --plink-tped \
@@ -89,7 +99,10 @@ zgrep -m 1 "^#CHROM" $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".
 | bash \
 >| $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.tfam
 
-### 03.A Run Relatedness check using KING1.9 on sunrhel4 ###
+####################################################
+##### 03.A Run Relatedness check using KING1.9 #####
+####################################################
+
 ##	Pedigree file needs to be modified, a final list of Coriell samples needs to be considered ##
 
 $PLINK2_DIR/plink --noweb --tfile $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV \
@@ -110,19 +123,24 @@ awk '$4!=0 {print $0}' $CORE_PATH/$PROJECT/TEMP/KING/$FAMILY.VQSR.PASS.SNV.HomoI
 awk '$4!=0 {print $0}' $CORE_PATH/$PROJECT/TEMP/KING/$FAMILY.VQSR.PASS.SNV.HomoIBD.kin0 \
 	>| $CORE_PATH/$PROJECT/$FAMILY/RELATEDNESS/$FAMILY.VQSR.PASS.SNV.HomoIBD.kin0.final.txt
 
-## Try PLINK for relatedness check ##
+###########################################
+##### Try PLINK for relatedness check #####
+###########################################
 
 $PLINK2_DIR/plink --noweb --maf 0.1 --genome --genome-full \
 	--bfile $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.bin \
 	--out $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.genome
 
-# Reformat output to make a better delimited table
+############################################################
+##### Reformat output to make a better delimited table #####
+############################################################
 
 sed -r 's/^ *//g ; s/[[:space:]]+/\t/g' $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.genome.genome \
 >| $CORE_PATH/$PROJECT/$FAMILY/RELATEDNESS/$FAMILY.VQSR.PASS.SNV.PLINK2.final.txt
 
-
-### 03.B Run PCA using KING1.9 on sunrhel4 ###
+##################################################
+##### 03.B Run PCA using KING1.9 on sunrhel4 #####
+##################################################
 
 $KING_DIR/king -b $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.bin.bed \
  --mds --ibs \
@@ -131,12 +149,18 @@ $KING_DIR/king -b $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.bin.bed \
 sed -r 's/^ *//g ; s/[[:space:]]+/\t/g' $CORE_PATH/$PROJECT/TEMP/KING/$FAMILY.VQSR.PASS.SNV.MDS_IBSpc.ped \
 >| $CORE_PATH/$PROJECT/$FAMILY/PCA/$FAMILY.VQSR.PASS.SNV.MDS_IBSpc.ped.final.txt
 
-## Try PLINK for PCA ##
+#############################
+##### Try PLINK for PCA #####
+#############################
 
 $PLINK2_DIR/plink --noweb --bfile $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.bin \
 	--read-genome $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.genome.genome \
 	--cluster --mds-plot 4 \
 	--out $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.mds
+
+############################################################
+##### Reformat output to make a better delimited table #####
+############################################################
 
 sed -r 's/^ *//g ; s/[[:space:]]+/\t/g' $CORE_PATH/$PROJECT/TEMP/PLINK/$FAMILY.VQSR.PASS.SNV.mds.mds \
 >| $CORE_PATH/$PROJECT/$FAMILY/PCA/$FAMILY.VQSR.PASS.SNV.mds.PLINK2.final.txt

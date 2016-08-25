@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,6 +33,7 @@ PROJECT=$5
 FAMILY=$6
 REF_GENOME=$7
 CHROMOSOME=$8
+PHASE3_1KG_AUTOSOMES=$9
 
 START_ADD_MORE_ANNOTATION=`date '+%s'`
 
@@ -46,15 +46,12 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation AlleleCountBySample \
 --annotation GCContent \
 --annotation GenotypeSummaries \
---annotation HardyWeinberg \
 --annotation HomopolymerRun \
---annotation InbreedingCoeff \
 --annotation MVLikelihoodRatio \
 --annotation SampleList \
 --annotation TandemRepeatAnnotator \
---annotation TransmissionDisequilibriumTest \
 --annotation VariantType \
---resource:OneKGP /isilon/sequencing/1000genomes/Full_Project/Sep_2014/20130502/ALL.autosomes.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf \
+--resource:OneKGP $PHASE3_1KG_AUTOSOMES \
 --expression OneKGP.AF \
 --expression OneKGP.EAS_AF \
 --expression OneKGP.AMR_AF \
@@ -86,15 +83,12 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation AlleleCountBySample \
 --annotation GCContent \
 --annotation GenotypeSummaries \
---annotation HardyWeinberg \
 --annotation HomopolymerRun \
---annotation InbreedingCoeff \
 --annotation MVLikelihoodRatio \
 --annotation SampleList \
 --annotation TandemRepeatAnnotator \
---annotation TransmissionDisequilibriumTest \
 --annotation VariantType \
---resource:OneKGP /isilon/sequencing/1000genomes/Full_Project/Sep_2014/20130502/ALL.autosomes.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf \
+--resource:OneKGP $PHASE3_1KG_AUTOSOMES \
 --expression OneKGP.AF \
 --expression OneKGP.EAS_AF \
 --expression OneKGP.AMR_AF \

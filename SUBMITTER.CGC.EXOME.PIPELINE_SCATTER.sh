@@ -9,27 +9,39 @@ PED_FILE=$2
 
 SCRIPT_DIR="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/scripts"
 
-JAVA_1_8="/isilon/sequencing/Kurt/Programs/Java/jdk1.8.0_73/bin"
 CORE_PATH="/isilon/sequencing/Seq_Proj/"
+
+
+# PIPELINE PROGRAMS
+JAVA_1_8="/isilon/sequencing/Kurt/Programs/Java/jdk1.8.0_73/bin"
 BWA_DIR="/isilon/sequencing/Kurt/Programs/BWA/bwa-0.7.8"
 PICARD_DIR="/isilon/sequencing/Kurt/Programs/Picard/picard-tools-2.1.1"
 GATK_DIR="/isilon/sequencing/CIDRSeqSuiteSoftware/gatk/GATK_3/GenomeAnalysisTK-nightly-2016-06-26-g15888ad"
 VERIFY_DIR="/isilon/sequencing/Kurt/Programs/VerifyBamID/verifyBamID_20120620/bin/"
-GENE_LIST="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/RefSeqGene.GRCh37.Ready.txt"
-VERIFY_VCF="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/Omni25_genotypes_1525_samples_v2.b37.PASS.ALL.sites.vcf"
-CODING_BED="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/UCSC_hg19_CodingOnly_083013_MERGED_noContigs_noCHR.bed"
 SAMTOOLS_DIR="/isilon/sequencing/Kurt/Programs/samtools/samtools-0.1.18"
 TABIX_DIR="/isilon/sequencing/Kurt/Programs/TABIX/tabix-0.2.6"
-CORE_PATH="/isilon/sequencing/Seq_Proj"
 DATAMASH_DIR="/isilon/sequencing/Kurt/Programs/PATH"
-CYTOBAND_BED="/isilon/sequencing/Kurt/CGC/GRCh37.Cytobands.bed"
 # BEDTOOLS IS v2.22.0
 BEDTOOLS_DIR="/isilon/sequencing/Kurt/Programs/PATH"
 VCFTOOLS_DIR="/isilon/sequencing/Kurt/Programs/VCFtools/vcftools_0.1.12b/bin"
 PLINK2_DIR="/isilon/sequencing/Kurt/Programs/PLINK2"
 KING_DIR="/isilon/sequencing/Kurt/Programs/KING/Linux-king19"
 
+# PIPELINE FILES
+GENE_LIST="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/RefSeqGene.GRCh37.Ready.txt"
+VERIFY_VCF="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/Omni25_genotypes_1525_samples_v2.b37.PASS.ALL.sites.vcf"
+CODING_BED="/isilon/sequencing/CIDRSeqSuiteSoftware/RELEASES/5.0.0/aux_files/UCSC_hg19_CodingOnly_083013_MERGED_noContigs_noCHR.bed"
+CYTOBAND_BED="/isilon/sequencing/Kurt/CGC/GRCh37.Cytobands.bed"
+
+HAPMAP="/isilon/sequencing/GATK_resource_bundle/2.5/b37/hapmap_3.3.b37.vcf"
+OMNI_1KG="/isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_omni2.5.b37.vcf"
+HI_CONF_1KG_PHASE1_SNP="/isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_phase1.snps.high_confidence.b37.vcf"
+MILLS_1KG_GOLD_INDEL="/isilon/sequencing/GATK_resource_bundle/2.2/b37/Mills_and_1000G_gold_standard.indels.b37.vcf"
+PHASE3_1KG_AUTOSOMES="/isilon/sequencing/1000genomes/Full_Project/Sep_2014/20130502/ALL.autosomes.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf"
+DBSNP_129="/isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.excluding_sites_after_129.vcf"
+
 CONTROL_PED_FILE="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/data/CGC_CONTROL_SET.ped"
+CONTROL_GVCF_LIST="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/data/Control_GVCF.list"
 
 #################################
 ##### MAKE A DIRECTORY TREE #####
@@ -66,7 +78,7 @@ MERGE_PED_MANIFEST ()
 {
 awk 1 $PED_FILE \
 | sed 's/\r//g' \
-| sort -k 2 \
+| sort -k 2,2 \
 | join -1 8 -2 2 ~/CGC_PIPELINE_TEMP/SORTED.$MANIFEST_PREFIX.txt /dev/stdin \
 | awk 'BEGIN {OFS="\t"} {print $2,$3,$4,$5,$6,$7,$8,$1,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23}' \
 >| ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt
@@ -138,7 +150,7 @@ print "qsub","-N","A.01_BWA_"$8"_"$2"_"$3"_"$4,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$2"_"$3"_"$4,$2"_"$3"_"$4".bam"}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | $DATAMASH_DIR/datamash -s -g 1,2,3 collapse 4 collapse 5 \
 | awk 'BEGIN {FS="\t"} \
@@ -154,7 +166,7 @@ gsub(/,/,",INPUT=/isilon/sequencing/Seq_Proj/"$1"/TEMP/",$5) \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","C.01_MARK_DUPLICATES_"$3"_"$1,\
@@ -167,7 +179,7 @@ print "qsub","-N","C.01_MARK_DUPLICATES_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($5,INDEL,";"); split($3,smtag,"[@-]"); \
 print "qsub","-N","D.01_REALIGNER_TARGET_CREATOR_"$3"_"$1,\
@@ -181,7 +193,7 @@ print "qsub","-N","D.01_REALIGNER_TARGET_CREATOR_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($5,INDEL,";"); split($3,smtag,"[@-]"); \
 print "qsub","-N","E.01_INDEL_REALIGNER_"$3"_"$1,\
@@ -194,7 +206,7 @@ print "qsub","-N","E.01_INDEL_REALIGNER_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18,$17,$15}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($5,INDEL,";"); split($3,smtag,"[@-]"); \
 print "qsub","-N","F.01_PERFORM_BQSR_"$3"_"$1,\
@@ -207,7 +219,7 @@ print "qsub","-N","F.01_PERFORM_BQSR_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","G.01_FINAL_BAM_"$3"_"$1,\
@@ -291,7 +303,7 @@ for SAMPLE in $(awk 'BEGIN {FS=","} NR>1 {print $8}' $SAMPLE_SHEET | sort | uniq
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$18,$17}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($5,INDEL,";"); split($3,smtag,"[@-]"); \
 print "qsub","-N","H.02_POST_BQSR_TABLE_"$3"_"$1,\
@@ -304,7 +316,7 @@ print "qsub","-N","H.02_POST_BQSR_TABLE_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($5,INDEL,";"); split($3,smtag,"[@-]"); \
 print "qsub","-N","H.02-A.01_ANALYZE_COVARIATES_"$3"_"$1,\
@@ -317,7 +329,7 @@ print "qsub","-N","H.02-A.01_ANALYZE_COVARIATES_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.03_DOC_CODING_10bpFLANKS_"$3"_"$1,\
@@ -330,7 +342,7 @@ print "qsub","-N","H.03_DOC_CODING_10bpFLANKS_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.03-A.01_DOC_CHROM_DEPTH_"$3"_"$1,\
@@ -343,7 +355,7 @@ print "qsub","-N","H.03-A.01_DOC_CHROM_DEPTH_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.05_DOC_TARGET_BED_"$3"_"$1,\
@@ -356,7 +368,7 @@ print "qsub","-N","H.05_DOC_TARGET_BED_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$17,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.06_COLLECT_MULTIPLE_METRICS_"$3"_"$1,\
@@ -369,7 +381,7 @@ print "qsub","-N","H.06_COLLECT_MULTIPLE_METRICS_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$15,$16}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.07_COLLECT_HS_METRICS_"$3"_"$1,\
@@ -382,7 +394,7 @@ print "qsub","-N","H.07_COLLECT_HS_METRICS_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.08_SELECT_VERIFYBAMID_VCF_"$3"_"$1,\
@@ -395,7 +407,7 @@ print "qsub","-N","H.08_SELECT_VERIFYBAMID_VCF_"$3"_"$1,\
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{split($3,smtag,"[@-]"); \
 print "qsub","-N","H.08-A.01_VERIFYBAMID_"$3"_"$1,\
@@ -530,7 +542,6 @@ done
 
 CALL_GENOTYPE_GVCF ()
 {
-# VITO FOUND THAT COULDN'T REUSE CHROMOSOME AS A VARIABLE OVER AGAIN. MIGHT HAVE TO MAKE IT LOCAL FOR THE LOOP IF YOU WANT TO KEEP THE SAME NAME.
 for CHROM in {{1..22},{X,Y}};
 do
 echo \
@@ -540,7 +551,7 @@ $HOLD_ID_PATH \
 -o $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/${FAMILY_INFO_ARRAY[2]}/LOGS/${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]}.GENOTYPE_GVCF_chr$CHROM.log \
 $SCRIPT_DIR/I.01_GENOTYPE_GVCF_SCATTER.sh \
 $JAVA_1_8 $GATK_DIR $CORE_PATH \
-${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]} ${FAMILY_INFO_ARRAY[4]} $CHROM
+${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]} ${FAMILY_INFO_ARRAY[4]} $CHROM $CONTROL_GVCF_LIST
 echo sleep 1s
 done
 }
@@ -586,7 +597,6 @@ qsub \
 
 for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq)
  do
- 	# echo $FAMILY
 	BUILD_HOLD_ID_PATH_GENOTYPE_GVCF_GATHER
 	CREATE_FAMILY_INFO_ARRAY
 	CALL_GENOTYPE_GVCF_GATHER
@@ -603,31 +613,31 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","J.01_VARIANT_RECALIBRATOR_SNP_"$2"_"$1,\
 "-hold_jid","I.01-A.01_GENOTYPE_GVCF_GATHER_"$1"_"$2,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_RECALIBRATOR_SNP.log",\
 "'$SCRIPT_DIR'""/J.01_VARIANT_RECALIBRATOR_SNP.sh",\
-"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,"'$HAPMAP'","'$OMNI_1KG'","'$HI_CONF_1KG_PHASE1_SNP'","'$DBSNP_129'""\n""sleep 1s"}'
 
 ### Run Variant Recalibrator for the INDEL model, this is done in parallel with the SNP model
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","J.02_VARIANT_RECALIBRATOR_INDEL_"$2"_"$1,\
 "-hold_jid","I.01-A.01_GENOTYPE_GVCF_GATHER_"$1"_"$2,\
 "-o","'$CORE_PATH'/"$1"/"$2"/LOGS/"$2"_"$1".VARIANT_RECALIBRATOR_INDEL.log",\
 "'$SCRIPT_DIR'""/J.02_VARIANT_RECALIBRATOR_INDEL.sh",\
-"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3"\n""sleep 1s"}'
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,"'$MILLS_1KG_GOLD_INDEL'""\n""sleep 1s"}'
 
 ### Run Apply Recalbration with the SNP model to the VCF file
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","K.01_APPLY_RECALIBRATION_SNP_"$2"_"$1,\
 "-hold_jid","J.01_VARIANT_RECALIBRATOR_SNP_"$2"_"$1",""J.02_VARIANT_RECALIBRATOR_INDEL_"$2"_"$1,\
@@ -639,7 +649,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","L.01_APPLY_RECALIBRATION_INDEL_"$2"_"$1,\
 "-hold_jid","K.01_APPLY_RECALIBRATION_SNP_"$2"_"$1,\
@@ -665,7 +675,7 @@ qsub \
 -o $CORE_PATH/${FAMILY_INFO_ARRAY[0]}/${FAMILY_INFO_ARRAY[2]}/LOGS/${FAMILY_INFO_ARRAY[2]}_${FAMILY_INFO_ARRAY[0]}.VARIANT_ANNOTATOR_$CHROMOSOME.log \
 $SCRIPT_DIR/P.01_VARIANT_ANNOTATOR_SCATTER.sh \
 $JAVA_1_8 $GATK_DIR $CORE_PATH $PED_FILE \
-${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]} $CHROMOSOME
+${FAMILY_INFO_ARRAY[0]} ${FAMILY_INFO_ARRAY[2]} ${FAMILY_INFO_ARRAY[3]} $CHROMOSOME $PHASE3_1KG_AUTOSOMES
 }
 
 for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt | sort | uniq);
@@ -788,7 +798,7 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 
 awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
 "-hold_jid","T.18_VARIANT_TO_TABLE_COHORT_ALL_SITES_GATHER_"$2"_"$1,\
@@ -802,7 +812,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","T.18-A.01-A.01_VARIANT_TO_TABLE_TABIX_COHORT_ALL_SITES_"$2"_"$1,\
 "-hold_jid","T.18-A.01_VARIANT_TO_TABLE_BGZIP_COHORT_ALL_SITES_"$2"_"$1,\
@@ -942,7 +952,7 @@ for FAMILY in $(awk 'BEGIN {FS="\t"} {print $19}' ~/CGC_PIPELINE_TEMP/$MANIFEST_
 
 awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","T.03-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES_"$2"_"$1,\
 "-hold_jid","T.03-2-A.01_VARIANT_TO_TABLE_FAMILY_ALL_SITES_GATHER_"$2"_"$1,\
@@ -956,7 +966,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","T.03-2-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_FAMILY_ALL_SITES_"$2"_"$1,\
 "-hold_jid","T.03-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_FAMILY_ALL_SITES_"$2"_"$1,\
@@ -1035,11 +1045,6 @@ for SAMPLE in $(awk 'BEGIN {FS="\t"} {print $8}' ~/CGC_PIPELINE_TEMP/$MANIFEST_P
 ##### DO PER CHROMOSOME VARIANT TO TABLE FOR SAMPLE ########################################################
 ############################################################################################################
 
-# CREATE_SAMPLE_INFO_ARRAY_2 ()
-# {
-# SAMPLE_INFO_ARRAY_2=(`awk '$8=="'$SAMPLE'" {print $1,$8,$19,$12,$17}' ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt`)
-# }
-
 CALL_VARIANT_TO_TABLE_SAMPLE_ALL_SITES ()
 {
 echo \
@@ -1104,7 +1109,7 @@ for SAMPLE in $(awk 'BEGIN {FS="\t"} {print $8}' ~/CGC_PIPELINE_TEMP/$MANIFEST_P
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","T.06-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
 "-hold_jid","T.06-2-A.01_VARIANT_TO_TABLE_SAMPLE_ALL_SITES_GATHER_"$3"_"$2"_"$1,\
@@ -1118,7 +1123,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","T.06-2-A.01-A.01-A.01_VARIANT_TO_TABLE_TABIX_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
 "-hold_jid","T.06-2-A.01-A.01_VARIANT_TO_TABLE_BGZIP_SAMPLE_ALL_SITES_"$3"_"$2"_"$1,\
@@ -1204,7 +1209,7 @@ for SAMPLE in $(awk 'BEGIN {FS="\t"} {print $8}' ~/CGC_PIPELINE_TEMP/$MANIFEST_P
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | awk '{print "qsub","-N","S.01_FILTER_COHORT_VARIANT_ONLY_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1259,7 +1264,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$12}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1271,7 +1276,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.10_FILTER_TO_INDEL_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1283,7 +1288,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.11_FILTER_TO_MIXED_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1295,7 +1300,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.12_FILTER_TO_SAMPLE_TARGET_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1307,7 +1312,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.13_FILTER_TO_SAMPLE_TARGET_INDEL_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1319,7 +1324,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.14_FILTER_TO_SAMPLE_TARGET_MIXED_ONLY_PASS_"$3"_"$2"_"$1,\
 "-hold_jid","P.01-A.01_VARIANT_ANNOTATOR_GATHER_"$2"_"$1,\
@@ -1333,7 +1338,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$16}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.01_FILTER_TO_SAMPLE_TITV_VCF_"$3"_"$2"_"$1,\
 "-hold_jid","S.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
@@ -1345,25 +1350,25 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN_"$3"_"$2"_"$1,\
 "-hold_jid","S.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TITV_VCF_KNOWN.log",\
 "'$SCRIPT_DIR'""/S.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN.sh",\
-"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5,"'$DBSNP_129'""\n""sleep 1s"}'
 
 # BREAK DOWN TO ALL PASSING SNV THAT FALL IN TITV BED FILE AND DO NOT OVERLAP WITH DBSNP 129
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL_"$3"_"$2"_"$1,\
 "-hold_jid","S.09_FILTER_TO_SNV_ONLY_PASS_"$3"_"$2"_"$1,\
 "-o","'$CORE_PATH'/"$1"/"$2"/"$3"/LOGS/"$3"_"$2"_"$1".FILTER_TO_TITV_VCF_NOVEL.log",\
 "'$SCRIPT_DIR'""/S.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL.sh",\
-"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5"\n""sleep 1s"}'
+"'$JAVA_1_8'","'$GATK_DIR'","'$CORE_PATH'",$1,$2,$3,$4,$5,"'$DBSNP_129'""\n""sleep 1s"}'
 
 ### RUN TITV FOR THE PASSING SNVS THAT FALL IN UCSC CODING REGIONS THAT TOUCH EITHER THE BED OR TARGET FILE
 
@@ -1371,7 +1376,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$12,$14}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.01-A.01_TITV_ALL_"$3"_"$2"_"$1,\
 "-hold_jid","S.09-A.01_FILTER_TO_SAMPLE_TITV_VCF_"$3"_"$2"_"$1,\
@@ -1383,7 +1388,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.02-A.01_TITV_KNOWN_"$3"_"$2"_"$1,\
 "-hold_jid","S.09-A.02_FILTER_TO_SAMPLE_TITV_VCF_KNOWN_"$3"_"$2"_"$1,\
@@ -1395,7 +1400,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk '{print "qsub","-N","S.09-A.03-A.01_TITV_NOVEL_"$3"_"$2"_"$1,\
 "-hold_jid","S.09-A.03_FILTER_TO_SAMPLE_TITV_VCF_NOVEL_"$3"_"$2"_"$1,\
@@ -1409,7 +1414,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 -k 3 \
+| sort -k 1,1 -k 2,2 -k 3,3 \
 | uniq \
 | awk 'BEGIN {FS="\t"}
 {print "qsub","-N","X.01-QC_REPORT_PREP_"$1"_"$3,\
@@ -1422,7 +1427,7 @@ awk 'BEGIN {OFS="\t"} {print $1,$19,$8,$20,$21,$22,$23}' \
 
 awk 'BEGIN {OFS="\t"} {print $1,$8}' \
 ~/CGC_PIPELINE_TEMP/$MANIFEST_PREFIX.$PED_PREFIX.join.txt \
-| sort -k 1 -k 2 \
+| sort -k 1,1 -k 2,2 \
 | uniq \
 | $DATAMASH_DIR/datamash -s -g 1 collapse 2 \
 | awk 'BEGIN {FS="\t"}

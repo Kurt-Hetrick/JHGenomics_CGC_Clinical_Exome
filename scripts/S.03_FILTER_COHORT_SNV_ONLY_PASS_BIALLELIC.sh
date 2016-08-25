@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q rnd.q,prod.q,test.q
 
@@ -33,7 +32,6 @@ PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
 
-
 # Filter to just on all of the variants all
 
 START_FILTER_COHORT_VARIANT_ONLY_PASS=`date '+%s'`
@@ -47,6 +45,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -selectType SNP \
 --restrictAllelesTo BIALLELIC \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+-nt 4 \
 -o $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.SNV_ONLY.PASS.BIALLELIC.vcf"
 
 END_FILTER_COHORT_VARIANT_ONLY_PASS=`date '+%s'`
@@ -65,13 +64,8 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -selectType SNP \
 --restrictAllelesTo BIALLELIC \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
+-nt 4 \
 -o $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.SNV_ONLY.PASS.BIALLELIC.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 
 echo >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
-
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.PASS.vcf" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"
-
-md5sum $CORE_PATH/$PROJECT/$FAMILY/VCF/"CONTROLS_PLUS_"$FAMILY".VQSR.ANNOTATED.VARIANT_ONLY.PASS.vcf.idx" \
->> $CORE_PATH/$PROJECT/REPORTS/$PROJECT".CIDR.Analysis.MD5.txt"

@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -34,13 +33,9 @@ FAMILY=$5
 REF_GENOME=$6
 DBSNP=$7
 CHROMOSOME=$8
+CONTROL_GVCF_LIST=$9
 
-RIS_ID=${SM_TAG%@*}
-BARCODE_2D=${SM_TAG#*@}
-
-# EVENTUALLY PUT THIS INTO THE SUBMITTER...or not
-
-CONTROL_REPO="/isilon/sequencing/Kurt/GIT_REPO/JHGenomics_CGC_Clinical_Exome/data"
+# Genotype the gvcf files
 
 START_GENOTYPE_GVCF=`date '+%s'`
 
@@ -65,8 +60,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation StrandAlleleCountsBySample \
 --annotation LikelihoodRankSumTest \
 -L $CHROMOSOME \
---excludeIntervals 1:145017822-145017822 \
---variant $CONTROL_REPO/Control_GVCF.list \
+--variant $CONTROL_GVCF_LIST \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW."$CHROMOSOME".vcf"
 
@@ -98,8 +92,7 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --annotation StrandAlleleCountsBySample \
 --annotation LikelihoodRankSumTest \
 -L $CHROMOSOME \
---excludeIntervals 1:145017822-145017822 \
---variant $CONTROL_REPO/Control_GVCF.list \
+--variant $CONTROL_GVCF_LIST \
 --variant $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".gvcf.list" \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW."$CHROMOSOME".vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY.COMMAND.LINES.txt

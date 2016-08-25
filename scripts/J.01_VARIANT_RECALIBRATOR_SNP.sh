@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,6 +34,10 @@ CORE_PATH=$3
 PROJECT=$4
 FAMILY=$5
 REF_GENOME=$6
+HAPMAP=$7
+OMNI_1KG=$8
+HI_CONF_1KG_PHASE1_SNP=$9
+DBSNP_129=${10}
 
 START_VARIANT_RECALIBRATOR_SNP=`date '+%s'`
 
@@ -42,10 +45,10 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
 --input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
--resource:hapmap,known=false,training=true,truth=true,prior=15.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/hapmap_3.3.b37.vcf \
--resource:omni,known=false,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_omni2.5.b37.vcf \
--resource:1000G,known=false,training=true,truth=false,prior=10.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_phase1.snps.high_confidence.b37.vcf \
--resource:dbsnp,known=true,training=false,truth=false,prior=2.0 /isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.vcf \
+-resource:hapmap,known=false,training=true,truth=true,prior=15.0 $HAPMAP \
+-resource:omni,known=false,training=true,truth=true,prior=12.0 $OMNI_1KG \
+-resource:1000G,known=false,training=true,truth=false,prior=10.0 $HI_CONF_1KG_PHASE1_SNP \
+-resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_129 \
 -mode SNP \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -an QD \
@@ -85,10 +88,10 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -T VariantRecalibrator \
 -R $REF_GENOME \
 --input:VCF $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".RAW.vcf" \
--resource:hapmap,known=false,training=true,truth=true,prior=15.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/hapmap_3.3.b37.vcf \
--resource:omni,known=false,training=true,truth=true,prior=12.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_omni2.5.b37.vcf \
--resource:1000G,known=false,training=true,truth=false,prior=10.0 /isilon/sequencing/GATK_resource_bundle/2.5/b37/1000G_phase1.snps.high_confidence.b37.vcf \
--resource:dbsnp,known=true,training=false,truth=false,prior=2.0 /isilon/sequencing/GATK_resource_bundle/2.8/b37/dbsnp_138.b37.vcf \
+-resource:hapmap,known=false,training=true,truth=true,prior=15.0 $HAPMAP \
+-resource:omni,known=false,training=true,truth=true,prior=12.0 $OMNI_1KG \
+-resource:1000G,known=false,training=true,truth=false,prior=10.0 $HI_CONF_1KG_PHASE1_SNP \
+-resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_129 \
 -mode SNP \
 --disable_auto_index_creation_and_locking_when_reading_rods \
 -an QD \
