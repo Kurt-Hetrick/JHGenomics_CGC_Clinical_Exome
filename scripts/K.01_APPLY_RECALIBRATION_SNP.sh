@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -44,6 +43,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
 -tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
 -mode SNP \
+-nt 4 \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.SNP.vcf"
 
 END_APPLY_RECALIBRATION_SNP=`date '+%s'`
@@ -62,6 +62,7 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 -recalFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.recal" \
 -tranchesFile $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".HC.SNV.tranches" \
 -mode SNP \
+-nt 4 \
 -o $CORE_PATH/$PROJECT/TEMP/CONTROLS_PLUS_$FAMILY".VQSR.SNP.vcf" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
 

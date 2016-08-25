@@ -4,7 +4,6 @@
 # tell sge to execute in bash
 #$ -S /bin/bash
 
-
 # tell sge to submit any of these queue when available
 #$ -q prod.q,rnd.q,test.q
 
@@ -35,8 +34,7 @@ SM_TAG=$6
 REF_GENOME=$7
 TARGET_BED=$8
 
-
-# Filter to just on all of the variants all
+# Filter to just on target passing snvs for the sample
 
 START_FILTER_TO_SAMPLE_TARGET_SNV_PASS=`date '+%s'`
 
@@ -52,6 +50,7 @@ $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --excludeFiltered \
 --keepOriginalDP \
 --removeUnusedAlternates \
+-nt 4 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_TARGET/$SM_TAG".SNV.ON_TARGET.PASS.vcf.gz"
 
@@ -74,6 +73,7 @@ echo $JAVA_1_8/java -jar $GATK_DIR/GenomeAnalysisTK.jar \
 --excludeFiltered \
 --keepOriginalDP \
 --removeUnusedAlternates \
+-nt 4 \
 --variant $CORE_PATH/$PROJECT/$FAMILY/VCF/CONTROLS_PLUS_$FAMILY".VQSR.ANNOTATED.vcf.gz" \
 -o $CORE_PATH/$PROJECT/$FAMILY/$SM_TAG/SNV/FILTERED_ON_TARGET/$SM_TAG".SNV.ON_TARGET.PASS.vcf.gz" \
 >> $CORE_PATH/$PROJECT/$FAMILY/$FAMILY".COMMAND.LINES.txt"
