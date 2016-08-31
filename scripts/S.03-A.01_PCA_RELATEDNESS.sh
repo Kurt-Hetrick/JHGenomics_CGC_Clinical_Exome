@@ -88,7 +88,7 @@ mv $CORE_PATH/$PROJECT/TEMP/PLINK/${FAMILY}.VQSR.PASS.SNV.tfam $CORE_PATH/$PROJE
 
 # Storing the path to concantenated ped file as a variable
 
-CONTROL_PED_FILE_FOR_FAMILY=`echo $CORE_PATH/$PROJECT/TEMP/"CONTROL_PED_FILE_FOR_"$FAMILY".ped"`
+CONTROL_PED_FILE_FOR_FAMILY=`echo $CORE_PATH/$PROJECT/TEMP/VCF_PREP/"CONTROLS_PLUS_"$FAMILY".ped"`
 
 ## Replace the tfam file with right pedigree info and in the sample order in the vcf file ##
 
